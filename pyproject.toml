@@ -1,0 +1,35 @@
+[project]
+name = "claims-triage"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "google-genai>=2.28.0",
+    "mcp[cli]>=2.3.0",
+    "a2a-sdk>=1.2.2",
+    "deepeval>=4.2.8",
+    "langfuse>=4.17.0",
+    "mlflow>=2.0",
+    "scikit-learn>=1.5",
+    "pandas>=2.0",
+    "python-dotenv>=1.0",
+    "pydantic>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.9",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = ["llm: calls an LLM (excluded by default)"]
+addopts = "-m 'not llm'"

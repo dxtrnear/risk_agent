@@ -1,0 +1,14 @@
+# Smoke test — no LLM call, verifies promptfoo is wired up.
+description: claims-triage smoke
+
+prompts:
+  - "OK"
+
+providers:
+  - id: "python:echo_provider.py"
+
+tests:
+  - vars: {}
+    assert:
+      - type: contains
+        value: "OK"

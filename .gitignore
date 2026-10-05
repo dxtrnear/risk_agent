@@ -1,0 +1,31 @@
+# secrets
+.env
+
+# uv / python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.ruff_cache/
+
+# data and models (large files, reproducible from scripts)
+data/raw/
+data/*.db
+models/*.joblib
+policy/raw/
+policy/*.faiss
+policy/*.pkl
+
+# mlflow
+mlruns/
+mlflow.db
+
+# pytest
+.pytest_cache/
+htmlcov/
+.coverage
+
+# misc
+.DS_Store
+*.log
