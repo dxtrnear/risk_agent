@@ -11,14 +11,13 @@ from sklearn.model_selection import train_test_split
 
 import config
 
-CATEGORICAL = ["area", "veh_brand", "veh_gas", "region", "formule"]
+CATEGORICAL = ["area", "veh_brand", "veh_gas", "region"]
 FEATURES = CATEGORICAL + [
     "veh_power",
     "veh_age",
     "driv_age",
     "bonus_malus",
     "density",
-    "franchise",
 ]
 
 
