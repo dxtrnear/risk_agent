@@ -22,11 +22,15 @@ def evaluate() -> None:
         hit = case["expected_clause_id"] in found_ids
         hits += hit
         status = "PASS" if hit else "FAIL"
-        print(f"[{status}] {case['query'][:60]:60} expected={case['expected_clause_id']:10} got={found_ids}")
+        expected = case["expected_clause_id"]
+        query_preview = case["query"][:60]
+        print(f"[{status}] {query_preview:60} expected={expected:10} got={found_ids}")
 
     print(f"\n{hits}/{len(queries)} passed (need >= {PASS_THRESHOLD})")
     if hits < PASS_THRESHOLD:
-        raise RuntimeError(f"Only {hits}/{len(queries)} queries hit top-5; checkpoint not met.")
+        raise RuntimeError(
+            f"Only {hits}/{len(queries)} queries hit top-5; checkpoint not met."
+        )
 
 
 if __name__ == "__main__":

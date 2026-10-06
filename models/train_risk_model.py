@@ -1,4 +1,4 @@
-"""Train the risk model: expected claims/year via a Poisson HGB, vs a predict-the-mean baseline."""
+"""Train the risk model: claims/year via Poisson HGB, vs a predict-the-mean baseline."""
 
 import sqlite3
 import sys
@@ -15,27 +15,18 @@ from sklearn.model_selection import train_test_split
 
 import config
 
-CATEGORICAL = ["area", "veh_brand", "veh_gas", "region"]
-FEATURES = CATEGORICAL + [
-    "veh_power",
-    "veh_age",
-    "driv_age",
-    "bonus_malus",
-    "density",
-]
-
 
 def _load_data() -> pd.DataFrame:
     conn = sqlite3.connect(config.CONTRACTS_DB)
     df = pd.read_sql("SELECT * FROM contracts", conn)
     conn.close()
-    for col in CATEGORICAL:
+    for col in config.CATEGORICAL:
         df[col] = df[col].astype("category")
     return df
 
 
 def train() -> None:
-    """Fit the model, compare it to a predict-the-mean baseline, save it only if it wins."""
+    """Fit the model, compare to a predict-the-mean baseline, save only if it wins."""
     df = _load_data()
     target = df["claim_nb"] / df["exposure"]
 
@@ -43,9 +34,11 @@ def train() -> None:
         df, target, test_size=config.HOLDOUT_FRACTION, random_state=config.RANDOM_SEED
     )
 
-    model = HistGradientBoostingRegressor(loss="poisson", random_state=config.RANDOM_SEED)
-    model.fit(train_df[FEATURES], train_y, sample_weight=train_df["exposure"])
-    pred = model.predict(test_df[FEATURES])
+    model = HistGradientBoostingRegressor(
+        loss="poisson", random_state=config.RANDOM_SEED
+    )
+    model.fit(train_df[config.FEATURES], train_y, sample_weight=train_df["exposure"])
+    pred = model.predict(test_df[config.FEATURES])
 
     baseline_rate = train_df["claim_nb"].sum() / train_df["exposure"].sum()
     baseline_pred = np.full(len(test_df), baseline_rate)
@@ -58,7 +51,9 @@ def train() -> None:
     print(f"Baseline Poisson deviance: {baseline_dev:.4f}")
 
     if model_dev >= baseline_dev:
-        raise RuntimeError("Model did not beat the predict-the-mean baseline; not saving.")
+        raise RuntimeError(
+            "Model did not beat the predict-the-mean baseline; not saving."
+        )
 
     config.RISK_MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, config.RISK_MODEL_PATH)

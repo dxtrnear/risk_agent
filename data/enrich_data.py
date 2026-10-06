@@ -1,4 +1,4 @@
-"""Add synthetic `formule` and `franchise` to the raw contracts, seeded for reproducibility."""
+"""Add synthetic `formule` and `franchise` to the raw contracts, seeded for repro."""
 
 import sys
 from pathlib import Path
@@ -42,7 +42,7 @@ def _assign_formule(veh_age: pd.Series, rng: np.random.Generator) -> np.ndarray:
 
 
 def _assign_franchise(formule: np.ndarray, rng: np.random.Generator) -> np.ndarray:
-    """No own-damage cover under `tiers` -> no franchise; richer cover -> higher franchise."""
+    """No own-damage cover under `tiers` -> no franchise; richer cover -> higher."""
     franchise = np.zeros(len(formule))
     etendu = formule == "tiers_etendu"
     tous = formule == "tous_risques"

@@ -9,6 +9,8 @@ CONTRACTS_CSV = ROOT / "data" / "raw" / "contracts_enriched.csv"
 CONTRACTS_DB = ROOT / "data" / "contracts.db"
 
 RISK_MODEL_PATH = ROOT / "models" / "risk_model.joblib"
+CATEGORICAL = ["area", "veh_brand", "veh_gas", "region"]
+FEATURES = CATEGORICAL + ["veh_power", "veh_age", "driv_age", "bonus_malus", "density"]
 
 POLICY_RAW_DIR = ROOT / "policy" / "raw"
 POLICY_PDF = ROOT / "policy" / "raw" / "pdf-mon-auto-cg.pdf"

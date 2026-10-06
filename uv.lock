@@ -544,7 +544,7 @@ requires-dist = [
     { name = "deepeval", specifier = ">=4.2.8" },
     { name = "google-genai", specifier = ">=2.28.0" },
     { name = "langfuse", specifier = ">=4.17.0" },
-    { name = "mcp", extras = ["cli"], specifier = ">=2.3.0" },
+    { name = "mcp", extras = ["cli"], specifier = "==2.3.0" },
     { name = "mlflow", specifier = ">=2.0" },
     { name = "pandas", specifier = ">=2.0" },
     { name = "pydantic", specifier = ">=2.0" },

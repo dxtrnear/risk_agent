@@ -1,6 +1,7 @@
 """Phase 0 smoke: one Gemini call logged as a Langfuse trace."""
 
 import os
+
 from dotenv import load_dotenv
 from google import genai
 from langfuse import Langfuse

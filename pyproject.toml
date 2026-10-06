@@ -4,7 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "google-genai>=2.28.0",
-    "mcp[cli]>=2.3.0",
+    "mcp[cli]==2.3.0",
     "a2a-sdk>=1.2.2",
     "deepeval>=4.2.8",
     "langfuse>=4.17.0",

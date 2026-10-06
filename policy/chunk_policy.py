@@ -41,7 +41,10 @@ def _is_noise(line: str) -> bool:
 def chunk(pdf_path) -> list[dict]:
     """Parse the policy PDF into {clause_id, title, text} dicts."""
     reader = PdfReader(pdf_path)
-    pages = [p.extract_text(extraction_mode="layout") for p in reader.pages[FIRST_PAGE_INDEX : LAST_PAGE_INDEX + 1]]
+    pages = [
+        p.extract_text(extraction_mode="layout")
+        for p in reader.pages[FIRST_PAGE_INDEX : LAST_PAGE_INDEX + 1]
+    ]
     lines = "\n".join(pages).split("\n")
 
     clauses: list[dict] = []
@@ -55,7 +58,9 @@ def chunk(pdf_path) -> list[dict]:
             return
         text = _clean(" ".join(buffer))
         if len(text.split()) >= MIN_WORDS:
-            clauses.append({"clause_id": current_id, "title": current_title, "text": text})
+            clauses.append(
+                {"clause_id": current_id, "title": current_title, "text": text}
+            )
 
     for line in lines:
         if _is_noise(line):
@@ -65,7 +70,9 @@ def chunk(pdf_path) -> list[dict]:
         if match:
             number, title = match.groups()
             top_level = int(number.split(".")[0])
-            is_new_chapter = "." not in number and top_level == (current_chapter or 2) + 1
+            is_new_chapter = (
+                "." not in number and top_level == (current_chapter or 2) + 1
+            )
             is_same_chapter = top_level == current_chapter
 
             if is_new_chapter or is_same_chapter:
