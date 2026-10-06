@@ -18,8 +18,8 @@ data/raw/
 data/*.db
 models/*.joblib
 policy/raw/
-policy/*.faiss
-policy/*.pkl
+policy/clauses.json
+policy/index.npz
 
 # mlflow
 mlruns/
