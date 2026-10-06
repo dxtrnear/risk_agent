@@ -1,5 +1,5 @@
 [
-  {"query": "On m'a volé ma voiture sur le parking de mon immeuble.", "expected_clause_id": "6.2"},
+  {"query": "On m'a piquer ma voiture sur le parking de mon immeuble.", "expected_clause_id": "6.2"},
   {"query": "Un gravillon a fissuré mon pare-brise sur l'autoroute.", "expected_clause_id": "6.1"},
   {"query": "J'ai percuté la voiture devant moi, je suis responsable, est-ce que les dégâts de l'autre véhicule sont couverts ?", "expected_clause_id": "4.1.2"},
   {"query": "Ma voiture a entièrement brûlé après un court-circuit électrique.", "expected_clause_id": "6.4"},

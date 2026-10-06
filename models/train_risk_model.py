@@ -1,6 +1,10 @@
 """Train the risk model: expected claims/year via a Poisson HGB, vs a predict-the-mean baseline."""
 
 import sqlite3
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import joblib
 import numpy as np

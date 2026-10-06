@@ -1,6 +1,10 @@
 """Phase 2 checkpoint: expected clause in top-5 for at least 13 of 15 test queries."""
 
 import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config
 from policy.index_policy import search
