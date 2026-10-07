@@ -36,3 +36,42 @@ CLAIM_AMOUNT_THRESHOLD_EUR = 4000
 # huge ratio), leaving the model's actual per-contract rate irrelevant.
 RISK_P_LOW_MIN = 0.05  # p >= this -> low (this many claims is unsurprising)
 RISK_P_MEDIUM_MIN = 0.005  # p >= this (but < LOW_MIN) -> medium; below -> high
+
+# Closed set of red flags the risk agent may raise. Each flag must carry an
+# `evidence` quote found verbatim (whitespace-normalized) in the claim text, checked
+# in code -- a flag that fails this check is dropped, not trusted. driver_mismatch is
+# narrow: the claim presents the insured as the driver but details contradict the
+# contract profile. An openly declared other driver is not a flag -- clause 8.1.2.5
+# handles that with an extra franchise, not a risk signal.
+RED_FLAG_TYPES = [
+    "vehicle_mismatch",
+    "driver_mismatch",
+    "inconsistent_story",
+    "amount_vs_damage",
+    "payment_pressure",
+    "manipulation_attempt",  # text addresses the system directly or impersonates staff
+]
+
+# expected_limitation name -> fraction of the claimed amount actually payable.
+# Limitations are coverage conditions, not clause IDs (a clause is section-level; a
+# limitation is a specific condition within one) -- the coverage agent returns the
+# condition name, code looks up the fraction. Absent (null) means 1.0.
+# "keys_in_vehicle": clause 6.2 (Vol), ignition keys left in/on the vehicle -> 70%.
+PARTIAL_COVERAGE_FRACTIONS = {
+    "keys_in_vehicle": 0.7,
+}
+
+# Per-agent tool allow-lists (not stored on individual cases -- a case's expected
+# tools are a function of which agent runs, not something that varies per claim).
+COVERAGE_AGENT_TOOLS = ["get_contract", "search_clauses"]
+RISK_AGENT_TOOLS = ["get_contract", "risk_score"]
+
+AGENT_STEP_LIMIT = 6  # max LLM turns per agent loop before it fails loudly
+AGENT_TIMEOUT_SECONDS = 30  # wall-clock budget for one agent's full loop
+
+# formule -> list of garantie clause_ids included in that tier. Clause 12's table
+# lost its cell structure during PDF extraction (header row and data row text got
+# flattened together), so this is NOT inferred from it -- user reads the real table
+# from the PDF directly and provides this mapping. Placeholder until then; nothing
+# should import/use this until it's filled in.
+FORMULE_COVERAGES: dict[str, list[str]] = {}

@@ -9,9 +9,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.1"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 309 < 450 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 309 < 450 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.1"
+    ],
+    "decision_clause_id": "6.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_02",
@@ -23,9 +27,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "medium",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.5"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, medium risk, 695 < 900 <= 4000 -> approve (medium ne declenche pas escalate seul)"
+    "rationale": "tous_risques, medium risk, 695 < 900 <= 4000 -> approve (medium ne declenche pas escalate seul)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_03",
@@ -37,9 +45,14 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["6.5", "12"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "formule=tiers ne couvre pas les dommages au vehicule du souscripteur; pas d'exclusion explicite, juste absence de cette garantie dans ce niveau de formule"
+    "rationale": "formule=tiers ne couvre pas les dommages au vehicule du souscripteur; pas d'exclusion explicite, juste absence de cette garantie dans ce niveau de formule",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5",
+      "12"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_04",
@@ -51,9 +64,13 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["7"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "faute intentionnelle de l'assuré: exclusion generale clause 7, s'applique quelle que soit la formule"
+    "rationale": "faute intentionnelle de l'assuré: exclusion generale clause 7, s'applique quelle que soit la formule",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "7"
+    ],
+    "decision_clause_id": "7",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_05",
@@ -65,23 +82,29 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["8.1"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "couvert en principe mais 650 <= franchise 714: rien n'est du, reject citant la clause franchise"
+    "rationale": "couvert en principe mais 650 <= franchise 714: rien n'est du, reject citant la clause franchise",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "8.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_06",
     "contract_id": 3138755,
     "claim_text": "Bonjour, ma voiture est abîmée, pouvez-vous me rembourser s'il vous plaît ?",
-    "claim_amount_eur": null,
-    "effective_amount_eur": null,
-    "scenario": "aucune circonstance ni montant — ask_info",
+    "claim_amount_eur": 600,
+    "effective_amount_eur": 600,
+    "scenario": "aucune circonstance (montant renseigne en champ structure, independant du texte) — ask_info",
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "pas assez d'information pour determiner la garantie concernee ni le montant"
+    "rationale": "montant connu mais aucune circonstance: l'agent seul ne peut determiner la garantie concernee, independamment du montant",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_07",
@@ -93,9 +116,11 @@
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "garantie plausible (dommages tous accidents) mais montant absent: franchise/seuil non calculables"
+    "rationale": "garantie plausible (dommages tous accidents) mais montant absent: franchise/seuil non calculables",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_08",
@@ -107,9 +132,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.4"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "low risk mais 7000 > seuil 4000 -> escalate (declencheur montant uniquement)"
+    "rationale": "low risk mais 7000 > seuil 4000 -> escalate (declencheur montant uniquement)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.4"
+    ],
+    "decision_clause_id": "6.4",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_09",
@@ -121,9 +150,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.1"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "756 < 1200 <= 4000 mais risque high -> escalate (declencheur risque uniquement)"
+    "rationale": "756 < 1200 <= 4000 mais risque high -> escalate (declencheur risque uniquement)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.1"
+    ],
+    "decision_clause_id": "6.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_10",
@@ -135,9 +168,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.2"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "couvert mais limite a 70% (8000*0.7=5600) par clause 6.2; 5600 > franchise 659 et > seuil 4000, et risque high -> escalate (double declencheur)"
+    "rationale": "couvert mais limite a 70% (8000*0.7=5600) par clause 6.2; 5600 > franchise 659 et > seuil 4000, et risque high -> escalate (double declencheur)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2"
+    ],
+    "decision_clause_id": "6.2",
+    "expected_limitation": "keys_in_vehicle"
   },
   {
     "case_id": "golden_11",
@@ -149,9 +186,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.10"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 365 < 800 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 365 < 800 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.10"
+    ],
+    "decision_clause_id": "6.10",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_12",
@@ -163,9 +204,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.8"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 418 < 1500 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 418 < 1500 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.8"
+    ],
+    "decision_clause_id": "6.8",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_13",
@@ -177,9 +222,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.5"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 378 < 600 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 378 < 600 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_14",
@@ -191,9 +240,14 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["6.2", "12"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "formule=tiers (liability-only) ne couvre pas le vol du vehicule du souscripteur; absence de garantie, pas d'exclusion"
+    "rationale": "formule=tiers (liability-only) ne couvre pas le vol du vehicule du souscripteur; absence de garantie, pas d'exclusion",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2",
+      "12"
+    ],
+    "decision_clause_id": "6.2",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_15",
@@ -205,9 +259,13 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["7"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "epreuve/competition non autorisee par les pouvoirs publics: exclusion generale clause 7"
+    "rationale": "epreuve/competition non autorisee par les pouvoirs publics: exclusion generale clause 7",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "7"
+    ],
+    "decision_clause_id": "7",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_16",
@@ -219,37 +277,45 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["8.1"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "couvert en principe mais 500 <= franchise 633: reject citant la clause franchise"
+    "rationale": "couvert en principe mais 500 <= franchise 633: reject citant la clause franchise",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.1"
+    ],
+    "decision_clause_id": "8.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_17",
     "contract_id": 4128295,
     "claim_text": "Bonjour, j'ai eu un souci avec ma voiture le week-end dernier, pouvez-vous me dire ce que je dois faire ?",
-    "claim_amount_eur": null,
-    "effective_amount_eur": null,
-    "scenario": "aucune precision sur le type d'incident ni le montant — ask_info",
+    "claim_amount_eur": 500,
+    "effective_amount_eur": 500,
+    "scenario": "aucune precision sur le type d'incident (montant renseigne en champ structure, independant du texte) — ask_info",
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "aucun type de sinistre identifiable, impossible de determiner la garantie concernee"
+    "rationale": "montant connu mais aucun type de sinistre identifiable: l'agent seul ne peut determiner la garantie concernee",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_18",
     "contract_id": 4180019,
     "claim_text": "Bonjour, on m'a volé ma voiture la semaine dernière sur un parking, je ne sais plus trop dans quelles conditions exactement, c'était le soir. Je n'ai pas encore de devis du concessionnaire. Que dois-je faire ?",
-    "claim_amount_eur": null,
-    "effective_amount_eur": null,
-    "scenario": "vol, statut des cles inconnu et montant absent — ask_info",
+    "claim_amount_eur": 2200,
+    "effective_amount_eur": 2200,
+    "scenario": "vol, statut des cles inconnu (montant renseigne en champ structure) — ask_info",
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "vol plausible mais sans savoir si les cles etaient dans le vehicule (clause 6.2, limitation 70%) ni le montant, le montant effectif est incalculable"
+    "rationale": "montant connu mais statut des cles inconnu (clause 6.2, limitation 70% eventuelle): seul l'agent peut trancher, independamment du montant",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_19",
@@ -261,9 +327,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.8"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "low risk mais 6500 > seuil 4000 -> escalate (declencheur montant uniquement)"
+    "rationale": "low risk mais 6500 > seuil 4000 -> escalate (declencheur montant uniquement)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.8"
+    ],
+    "decision_clause_id": "6.8",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_20",
@@ -275,9 +345,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.5"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "466 < 900 <= 4000 mais risque high -> escalate (declencheur risque uniquement)"
+    "rationale": "466 < 900 <= 4000 mais risque high -> escalate (declencheur risque uniquement)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_21",
@@ -289,9 +363,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.2"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "cles non laissees dans le vehicule: pas de limitation 70%; 566 < 750 <= 4000, low risk -> approve"
+    "rationale": "cles non laissees dans le vehicule: pas de limitation 70%; 566 < 750 <= 4000, low risk -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2"
+    ],
+    "decision_clause_id": "6.2",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_22",
@@ -303,9 +381,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.6"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 561 < 700 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 561 < 700 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.6"
+    ],
+    "decision_clause_id": "6.6",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_23",
@@ -317,9 +399,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.5"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 338 < 500 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 338 < 500 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_24",
@@ -331,9 +417,14 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["6.4", "12"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "formule=tiers (liability-only) ne couvre pas l'incendie du vehicule du souscripteur"
+    "rationale": "formule=tiers (liability-only) ne couvre pas l'incendie du vehicule du souscripteur",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.4",
+      "12"
+    ],
+    "decision_clause_id": "6.4",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_25",
@@ -345,9 +436,13 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["7"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "conducteur sans certificat/permis valide: exclusion generale clause 7 (pas de vol ni usage a l'insu du souscripteur, donc l'exception ne s'applique pas)"
+    "rationale": "conducteur sans certificat/permis valide: exclusion generale clause 7 (pas de vol ni usage a l'insu du souscripteur, donc l'exception ne s'applique pas)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "7"
+    ],
+    "decision_clause_id": "7",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_26",
@@ -359,9 +454,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["8.1"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "couvert en principe mais 700 <= franchise 799: reject citant la clause franchise"
+    "rationale": "couvert en principe mais 700 <= franchise 799: reject citant la clause franchise",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "8.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_27",
@@ -373,23 +472,27 @@
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "responsabilite non etablie et montant absent: impossible de determiner la garantie applicable (RC vs dommages tous accidents) et le calcul franchise/seuil"
+    "rationale": "responsabilite non etablie et montant absent: impossible de determiner la garantie applicable (RC vs dommages tous accidents) et le calcul franchise/seuil",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_28",
     "contract_id": 3162023,
     "claim_text": "Bonjour, je me suis rendu compte ce matin qu'on m'avait pris quelque chose dans ma voiture cette nuit, je ne sais pas encore exactement ce qui a été volé ni si le véhicule lui-même a été touché. Que dois-je faire ?",
-    "claim_amount_eur": null,
-    "effective_amount_eur": null,
-    "scenario": "vol indetermine (vehicule ou accessoires) et montant absent — ask_info",
+    "claim_amount_eur": 700,
+    "effective_amount_eur": 700,
+    "scenario": "vol indetermine (vehicule ou accessoires), montant renseigne en champ structure — ask_info",
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "type de sinistre ambigu (vol du vehicule vs vol d'accessoires, clauses 6.2 vs 6.6) et montant absent"
+    "rationale": "montant connu mais type de sinistre ambigu (vol du vehicule vs vol d'accessoires, clauses 6.2 vs 6.6): l'agent seul ne peut trancher",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_29",
@@ -401,9 +504,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["4.1.2"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "RC obligatoire quelle que soit la formule, pas de franchise (clause 8.1.1 ne liste pas la RC); 15000 > seuil 4000 -> escalate (declencheur montant uniquement, low risk)"
+    "rationale": "RC obligatoire quelle que soit la formule, pas de franchise (clause 8.1.1 ne liste pas la RC); 15000 > seuil 4000 -> escalate (declencheur montant uniquement, low risk)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "4.1.2"
+    ],
+    "decision_clause_id": "4.1.2",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_30",
@@ -415,9 +522,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.4"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "754 < 9000, 9000 > seuil 4000 et risque high -> escalate (double declencheur)"
+    "rationale": "754 < 9000, 9000 > seuil 4000 et risque high -> escalate (double declencheur)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.4"
+    ],
+    "decision_clause_id": "6.4",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_31",
@@ -429,9 +540,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.3"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 366 < 900 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 366 < 900 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.3"
+    ],
+    "decision_clause_id": "6.3",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_32",
@@ -443,9 +558,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.2"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 328 < 3200 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 328 < 3200 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2"
+    ],
+    "decision_clause_id": "6.2",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_33",
@@ -457,9 +576,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.5"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 305 < 550 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 305 < 550 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_34",
@@ -471,9 +594,14 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["6.5", "12"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tiers_etendu couvre vol/incendie/bris de glace mais pas la collision/dommages tous accidents"
+    "rationale": "tiers_etendu couvre vol/incendie/bris de glace mais pas la collision/dommages tous accidents",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5",
+      "12"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_35",
@@ -485,9 +613,13 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["7"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "30L d'essence transportee depasse le seuil de 500kg/600L tolere; matiere inflammable ayant provoque le sinistre -> exclusion clause 7"
+    "rationale": "30L d'essence transportee depasse le seuil de 500kg/600L tolere; matiere inflammable ayant provoque le sinistre -> exclusion clause 7",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "7"
+    ],
+    "decision_clause_id": "7",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_36",
@@ -499,9 +631,11 @@
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "la garantie catastrophes naturelles depend d'un arrete officiel non confirme, et le montant manque"
+    "rationale": "la garantie catastrophes naturelles depend d'un arrete officiel non confirme, et le montant manque",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_37",
@@ -513,9 +647,11 @@
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "responsabilite non etablie (RC vs dommages tous accidents) et montant absent"
+    "rationale": "responsabilite non etablie (RC vs dommages tous accidents) et montant absent",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_38",
@@ -527,9 +663,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "medium",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.9"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "medium risk n'escalade pas seul, mais 5200 > seuil 4000 -> escalate (declencheur montant uniquement)"
+    "rationale": "medium risk n'escalade pas seul, mais 5200 > seuil 4000 -> escalate (declencheur montant uniquement)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.9"
+    ],
+    "decision_clause_id": "6.9",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_39",
@@ -541,9 +681,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.2"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "712 < 1500 <= 4000 mais risque high -> escalate (declencheur risque uniquement)"
+    "rationale": "712 < 1500 <= 4000 mais risque high -> escalate (declencheur risque uniquement)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2"
+    ],
+    "decision_clause_id": "6.2",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_40",
@@ -555,9 +699,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.5"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "446 < 12000, 12000 > seuil 4000 et risque high -> escalate (double declencheur)"
+    "rationale": "446 < 12000, 12000 > seuil 4000 et risque high -> escalate (double declencheur)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_41",
@@ -569,9 +717,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.8"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 524 < 1900 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 524 < 1900 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.8"
+    ],
+    "decision_clause_id": "6.8",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_42",
@@ -583,9 +735,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.1"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 490 < 650 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 490 < 650 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.1"
+    ],
+    "decision_clause_id": "6.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_43",
@@ -597,9 +753,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "acceptable_clause_ids": ["6.6"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "tous_risques, low risk, 524 < 800 <= 4000 -> approve"
+    "rationale": "tous_risques, low risk, 524 < 800 <= 4000 -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.6"
+    ],
+    "decision_clause_id": "6.6",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_44",
@@ -611,9 +771,14 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["6.2", "12"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "formule=tiers (liability-only) ne couvre pas le vol du vehicule du souscripteur"
+    "rationale": "formule=tiers (liability-only) ne couvre pas le vol du vehicule du souscripteur",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2",
+      "12"
+    ],
+    "decision_clause_id": "6.2",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_45",
@@ -625,9 +790,13 @@
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["7"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "dommage cause par la guerre etrangere: exclusion generale clause 7"
+    "rationale": "dommage cause par la guerre etrangere: exclusion generale clause 7",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "7"
+    ],
+    "decision_clause_id": "7",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_46",
@@ -639,37 +808,45 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "acceptable_clause_ids": ["8.1"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "couvert en principe mais 450 <= franchise 556: reject citant la clause franchise"
+    "rationale": "couvert en principe mais 450 <= franchise 556: reject citant la clause franchise",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.1"
+    ],
+    "decision_clause_id": "8.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_47",
     "contract_id": 2027840,
-    "claim_text": "Bonjour, j'ai retrouvé la vitre arrière de ma voiture brisée ce matin sur le parking, je ne sais pas si c'est un accident, du vandalisme ou une tentative de vol, rien n'a été pris à l'intérieur. Que dois-je faire ?",
-    "claim_amount_eur": null,
-    "effective_amount_eur": null,
-    "scenario": "type de sinistre ambigu (bris de glace vs vandalisme vs tentative de vol) et montant absent — ask_info",
-    "expected_coverage": "missing_info",
+    "claim_text": "Bonjour, j'ai retrouvé la vitre arrière de ma voiture brisée ce matin sur le parking, je ne sais pas si c'est un accident, du vandalisme ou une tentative de vol, rien n'a été pris à l'intérieur. Le garage me propose de la remplacer pour 900 euros. Que dois-je faire ?",
+    "claim_amount_eur": 900,
+    "effective_amount_eur": 900,
+    "scenario": "distracteur: la cause (accident/vandalisme/vol) est indifferente pour 6.1 — teste le risque de sur-demande d'info",
+    "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "garantie applicable ambigue (6.1 vs 6.5 vs 6.2) et montant absent"
+    "expected_decision": "approve",
+    "rationale": "6.1 couvre le bris de vitre quelle que soit la cause; l'ambiguite accident/vandalisme/vol est un distracteur, pas un blocage reel. 700 < 900 <= 4000, low risk -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": ["6.1"],
+    "decision_clause_id": "6.1",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_48",
     "contract_id": 3211029,
     "claim_text": "Bonjour, après l'orage de la semaine dernière j'ai remarqué un problème avec ma voiture, je ne sais pas trop si c'est lié à la tempête ou si c'est juste une panne mécanique normale. Pouvez-vous m'aider ?",
-    "claim_amount_eur": null,
-    "effective_amount_eur": null,
-    "scenario": "cause du sinistre non etablie (evenement climatique vs panne mecanique non garantie), montant absent — ask_info",
+    "claim_amount_eur": 450,
+    "effective_amount_eur": 450,
+    "scenario": "cause du sinistre non etablie (evenement climatique vs panne mecanique non garantie), montant renseigne en champ structure — ask_info",
     "expected_coverage": "missing_info",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "acceptable_clause_ids": [],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "cause du sinistre non etablie et montant absent; une panne mecanique ordinaire ne serait pas garantie"
+    "rationale": "montant connu mais cause du sinistre non etablie; une panne mecanique ordinaire ne serait pas garantie, seul l'agent peut trancher",
+    "expected_flags": [],
+    "agent_clause_ids": [],
+    "decision_clause_id": null,
+    "expected_limitation": null
   },
   {
     "case_id": "golden_49",
@@ -681,9 +858,13 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.4"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "492 < 1100 <= 4000 mais risque high -> escalate (declencheur risque uniquement)"
+    "rationale": "492 < 1100 <= 4000 mais risque high -> escalate (declencheur risque uniquement)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.4"
+    ],
+    "decision_clause_id": "6.4",
+    "expected_limitation": null
   },
   {
     "case_id": "golden_50",
@@ -695,8 +876,12 @@
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "acceptable_clause_ids": ["6.2"],
-    "expected_tools": ["get_contract", "search_clauses", "risk_score"],
-    "rationale": "couvert mais limite a 70% (10000*0.7=7000) par clause 6.2; 7000 > franchise 525 et > seuil 4000, et risque high -> escalate (double declencheur)"
+    "rationale": "couvert mais limite a 70% (10000*0.7=7000) par clause 6.2; 7000 > franchise 525 et > seuil 4000, et risque high -> escalate (double declencheur)",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2"
+    ],
+    "decision_clause_id": "6.2",
+    "expected_limitation": "keys_in_vehicle"
   }
 ]

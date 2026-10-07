@@ -6,12 +6,12 @@
   {"query": "Combien de temps ai-je pour déclarer mon sinistre après l'accident ?", "expected_clause_id": "9"},
   {"query": "Comment est calculée la franchise forfaitaire que je dois payer ?", "expected_clause_id": "8.1.2.1"},
   {"query": "Je veux engager un recours juridique contre le responsable après l'accident, suis-je accompagné ?", "expected_clause_id": "4.2"},
-  {"query": "Ma voiture est tombée en panne sur l'autoroute, j'ai besoin d'un remorquage.", "expected_clause_id": "5.2.1"},
+  {"query": "Ma voiture a été endommagée lors d'un attentat près de chez moi.", "expected_clause_id": "6.3"},
   {"query": "Mon conjoint a été blessé dans l'accident, est-ce que son préjudice corporel est couvert ?", "expected_clause_id": "5.1"},
   {"query": "Quel est le délai de paiement de mon indemnisation une fois l'accord trouvé ?", "expected_clause_id": "10.2"},
   {"query": "Ma voiture a été endommagée par la grêle.", "expected_clause_id": "6.10"},
   {"query": "Un tremblement de terre a endommagé mon véhicule, suis-je couvert ?", "expected_clause_id": "6.8"},
-  {"query": "Je veux résilier mon contrat, quelles sont les règles ?", "expected_clause_id": "11.3"},
+  {"query": "On m'a volé mon ordinateur portable qui était dans le coffre de ma voiture.", "expected_clause_id": "5.2.4"},
   {"query": "Quelles sont les garanties incluses dans la formule Tous Risques ?", "expected_clause_id": "12"},
   {"query": "Qu'est-ce qui n'est jamais couvert par mon assurance, même en option ?", "expected_clause_id": "7"}
 ]

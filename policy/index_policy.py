@@ -48,7 +48,7 @@ def build_index() -> None:
     )
 
 
-def search(query: str, k: int = 5) -> list[dict]:
+def search(query: str, k: int = 3) -> list[dict]:
     """Return the top-k clauses by cosine similarity to the query."""
     data = np.load(config.POLICY_INDEX, allow_pickle=False)
     embeddings = data["embeddings"]

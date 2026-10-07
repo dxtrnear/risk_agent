@@ -83,7 +83,7 @@ def create_server(contract_id: int, search_fn=default_search) -> MCPServer:
         return {"expected_claims_per_year": rate}
 
     @server.tool()
-    def search_clauses(query: str, k: int = 5) -> dict:
+    def search_clauses(query: str, k: int = 3) -> dict:
         """Search the policy's conditions générales for clauses relevant to a
         French-language description of a claim or coverage question. Returns up to
         k clauses ranked by relevance, each with its clause_id, title and text. Use
