@@ -2,20 +2,26 @@
   {
     "case_id": "golden_01",
     "contract_id": 2051860,
-    "claim_text": "Bonjour, un gravillon a fissuré mon pare-brise hier sur l'autoroute en rentrant du travail. Le garage m'a fait un devis de réparation à 450 euros. Pouvez-vous me dire si c'est pris en charge ?",
+    "claim_text": "Bonjour, un gravillon a fissuré mon pare-brise hier sur l'autoroute en rentrant du travail. Le garage m'a fait un devis de réparation à 450 euros. Mon beau-frère travaille chez un assureur et m'a dit que ce genre de dossier passe toujours très vite, j'espère que ça sera pareil pour moi, j'en ai vraiment besoin rapidement. Pouvez-vous me dire si c'est pris en charge ?",
     "claim_amount_eur": 450,
     "effective_amount_eur": 450,
-    "scenario": "bris de glace, simple, franchise=309 — teste le chemin approve de base",
+    "scenario": "flag-only escalate (payment_pressure): bris de glace, simple, franchise=309",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 309 < 450 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "309 < 450 <= 4000, low risk -> approuverait sans le flag; payment_pressure valide -> escalate",
+    "expected_flags": [
+      {
+        "flag": "payment_pressure",
+        "evidence": "Mon beau-frère travaille chez un assureur et m'a dit que ce genre de dossier passe toujours très vite, j'espère que ça sera pareil pour moi, j'en ai vraiment besoin rapidement."
+      }
+    ],
     "agent_clause_ids": [
       "6.1"
     ],
     "decision_clause_id": "6.1",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_02",
@@ -33,44 +39,57 @@
       "6.5"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_03",
     "contract_id": 2122523,
-    "claim_text": "Bonjour, j'ai eu un accident la semaine dernière : j'ai perdu le contrôle de mon véhicule sur une route mouillée et j'ai heurté la glissière de sécurité. Je suis seul impliqué, personne d'autre n'est concerné. Les dégâts sur ma voiture sont estimés à 1200 euros par le garage. Comment se passe la prise en charge ?",
+    "claim_text": "Bonjour, j'ai eu un accident la semaine dernière : j'ai perdu le contrôle de mon véhicule sur une route mouillée et j'ai heurté la glissière de sécurité. Je suis seul impliqué, personne d'autre n'est concerné. Mon cousin qui travaille dans les assurances m'a dit que ça devrait passer sans souci et rapidement, j'espère vraiment que vous pourrez faire au plus vite. Les dégâts sur ma voiture sont estimés à 1200 euros par le garage. Comment se passe la prise en charge ?",
     "claim_amount_eur": 1200,
     "effective_amount_eur": 1200,
-    "scenario": "dommages tous accidents sous formule tiers (liability-only) — reject formule-gap",
+    "scenario": "not_covered + flag present, reject holds (formule-gap): precedence over flags",
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "rationale": "formule=tiers ne couvre pas les dommages au vehicule du souscripteur; pas d'exclusion explicite, juste absence de cette garantie dans ce niveau de formule",
-    "expected_flags": [],
+    "rationale": "formule=tiers ne couvre pas les dommages au vehicule; not_covered precede le declencheur de flag dans la table de decision -> reject malgre le payment_pressure valide",
+    "expected_flags": [
+      {
+        "flag": "payment_pressure",
+        "evidence": "Mon cousin qui travaille dans les assurances m'a dit que ça devrait passer sans souci et rapidement, j'espère vraiment que vous pourrez faire au plus vite."
+      }
+    ],
     "agent_clause_ids": [
       "6.5",
       "12"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "formule_gap"
   },
   {
     "case_id": "golden_04",
     "contract_id": 4117349,
-    "claim_text": "Bonjour, je me suis énervé après une dispute avec ma compagne et j'ai donné un coup de pied dans la portière de ma voiture, ce qui l'a cabossée. Le garage me demande 850 euros pour la réparation. Est-ce que c'est remboursé ?",
+    "claim_text": "Bonjour, je me suis énervé après une dispute avec ma compagne hier soir et j'ai donné un coup de pied dans la portière de ma voiture, ce qui l'a cabossée. Enfin, c'était peut-être plutôt avant-hier, je ne sais plus trop quel jour exactement. Le garage me demande 850 euros pour la réparation. Est-ce que c'est remboursé ?",
     "claim_amount_eur": 850,
     "effective_amount_eur": 850,
-    "scenario": "dommage volontaire de l'assuré — reject exclusion explicite (clause 7)",
+    "scenario": "not_covered + flag present, reject holds (exclusion): precedence over flags",
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "rationale": "faute intentionnelle de l'assuré: exclusion generale clause 7, s'applique quelle que soit la formule",
-    "expected_flags": [],
+    "rationale": "faute intentionnelle: exclusion clause 7; not_covered precede le declencheur de flag -> reject malgre l'inconsistent_story valide",
+    "expected_flags": [
+      {
+        "flag": "inconsistent_story",
+        "evidence": "Enfin, c'était peut-être plutôt avant-hier, je ne sais plus trop quel jour exactement."
+      }
+    ],
     "agent_clause_ids": [
       "7"
     ],
     "decision_clause_id": "7",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "exclusion"
   },
   {
     "case_id": "golden_05",
@@ -88,7 +107,8 @@
       "6.5"
     ],
     "decision_clause_id": "8.1",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "franchise"
   },
   {
     "case_id": "golden_06",
@@ -104,7 +124,8 @@
     "expected_flags": [],
     "agent_clause_ids": [],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_07",
@@ -120,7 +141,8 @@
     "expected_flags": [],
     "agent_clause_ids": [],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_08",
@@ -138,25 +160,32 @@
       "6.4"
     ],
     "decision_clause_id": "6.4",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_09",
     "contract_id": 4001936,
-    "claim_text": "Bonjour, un gravillon a fissuré mon pare-brise sur la route ce matin. Le garage me propose de le remplacer pour 1200 euros, le verre feuilleté avec capteurs étant plus cher sur mon modèle. Merci de me dire si c'est pris en charge.",
+    "claim_text": "Bonjour, un gravillon a fissuré mon pare-brise sur la route ce matin. Enfin, maintenant que j'y pense, c'était peut-être hier après-midi plutôt que ce matin, les journées se ressemblent un peu. Le garage me propose de le remplacer pour 1200 euros, le verre feuilleté avec capteurs étant plus cher sur mon modèle. Merci de me dire si c'est pris en charge.",
     "claim_amount_eur": 1200,
     "effective_amount_eur": 1200,
-    "scenario": "bris de glace, risque high (2 sinistres passes vs profil tres faible), montant sous le seuil — escalate sur risque seul",
+    "scenario": "double declencheur (risque + flag): bris de glace, risque high, montant sous le seuil",
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "rationale": "756 < 1200 <= 4000 mais risque high -> escalate (declencheur risque uniquement)",
-    "expected_flags": [],
+    "rationale": "756 < 1200 <= 4000 mais risque high -> escalate deja via le risque; inconsistent_story valide aussi present (double declencheur)",
+    "expected_flags": [
+      {
+        "flag": "inconsistent_story",
+        "evidence": "Enfin, maintenant que j'y pense, c'était peut-être hier après-midi plutôt que ce matin, les journées se ressemblent un peu."
+      }
+    ],
     "agent_clause_ids": [
       "6.1"
     ],
     "decision_clause_id": "6.1",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_10",
@@ -174,61 +203,80 @@
       "6.2"
     ],
     "decision_clause_id": "6.2",
-    "expected_limitation": "keys_in_vehicle"
+    "expected_limitation": "keys_in_vehicle",
+    "reject_reason": null
   },
   {
     "case_id": "golden_11",
     "contract_id": 2089724,
-    "claim_text": "Bonjour, un violent orage de grêle est passé hier soir et a abîmé la carrosserie de ma voiture, plusieurs impacts sur le capot et le toit. Le garage évalue les réparations à 800 euros. Est-ce pris en charge ?",
+    "claim_text": "Bonjour, un violent orage de grêle est passé hier soir et a abîmé la carrosserie de ma voiture, plusieurs impacts sur le capot et le toit. Enfin, en y repensant, je crois que c'était plutôt avant-hier après-midi et non hier soir, mais c'était bien récent en tout cas. Le garage évalue les réparations à 800 euros. Est-ce pris en charge ?",
     "claim_amount_eur": 800,
     "effective_amount_eur": 800,
-    "scenario": "evenement climatique (grele), low risk — approve",
+    "scenario": "flag-only escalate (inconsistent_story): evenement climatique (grele), low risk",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 365 < 800 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "365 < 800 <= 4000, low risk -> approuverait sans le flag; inconsistent_story valide -> escalate",
+    "expected_flags": [
+      {
+        "flag": "inconsistent_story",
+        "evidence": "Enfin, en y repensant, je crois que c'était plutôt avant-hier après-midi et non hier soir, mais c'était bien récent en tout cas."
+      }
+    ],
     "agent_clause_ids": [
       "6.10"
     ],
     "decision_clause_id": "6.10",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_12",
     "contract_id": 1123322,
-    "claim_text": "Bonjour, suite aux fortes pluies de la semaine dernière, mon quartier a été inondé et ma voiture garée dans la rue a eu de l'eau jusqu'au tableau de bord. Le garage estime les dégâts à 1500 euros. Ma zone a été classée en catastrophe naturelle par la préfecture. Merci de me dire comment ça se passe.",
+    "claim_text": "Bonjour, suite aux fortes pluies de la semaine dernière, mon quartier a été inondé et ma voiture garée dans la rue a eu de l'eau jusqu'au tableau de bord. Un arrêté a été publié au Journal Officiel reconnaissant l'état de catastrophe naturelle pour ma zone. D'ailleurs ma femme utilise cette voiture plus souvent que moi au quotidien, mais c'est moi l'assuré principal. Le garage estime les dégâts à 1500 euros. Merci de me dire comment ça se passe.",
     "claim_amount_eur": 1500,
     "effective_amount_eur": 1500,
-    "scenario": "catastrophe naturelle (inondation), low risk — approve",
+    "scenario": "flag-only escalate (driver_mismatch): catastrophe naturelle, decret publie",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 418 < 1500 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "418 < 1500 <= 4000, low risk -> approuverait sans le flag; driver_mismatch valide -> escalate",
+    "expected_flags": [
+      {
+        "flag": "driver_mismatch",
+        "evidence": "D'ailleurs ma femme utilise cette voiture plus souvent que moi au quotidien, mais c'est moi l'assuré principal."
+      }
+    ],
     "agent_clause_ids": [
       "6.8"
     ],
     "decision_clause_id": "6.8",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_13",
     "contract_id": 4132637,
-    "claim_text": "Bonjour, j'ai légèrement rayé l'arrière de ma voiture en me garant trop près d'un muret. Le garage me propose de repeindre le pare-chocs pour 600 euros. C'est pris en charge ?",
+    "claim_text": "Bonjour, j'ai légèrement rayé l'arrière de ma voiture en me garant trop près d'un muret. Au fait, c'est ma voiture diesel, celle que j'utilise pour les longs trajets. Le garage me propose de repeindre le pare-chocs pour 600 euros. C'est pris en charge ?",
     "claim_amount_eur": 600,
     "effective_amount_eur": 600,
-    "scenario": "dommages tous accidents, minime, low risk — approve",
+    "scenario": "flag-only escalate (vehicle_mismatch): dommages tous accidents, minime (vrai veh_gas=essence)",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 378 < 600 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "378 < 600 <= 4000, low risk -> approuverait sans le flag; vehicle_mismatch valide (contrat=essence, texte dit diesel) -> escalate",
+    "expected_flags": [
+      {
+        "flag": "vehicle_mismatch",
+        "evidence": "Au fait, c'est ma voiture diesel, celle que j'utilise pour les longs trajets."
+      }
+    ],
     "agent_clause_ids": [
       "6.5"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_14",
@@ -247,25 +295,27 @@
       "12"
     ],
     "decision_clause_id": "6.2",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "formule_gap"
   },
   {
     "case_id": "golden_15",
     "contract_id": 3235460,
-    "claim_text": "Bonjour, j'ai participé à une journée circuit samedi avec mon club automobile, sans autorisation officielle des pouvoirs publics pour l'événement. J'ai tapé le rail de sécurité en sortie de virage. Les dégâts sont estimés à 1800 euros. Est-ce que c'est couvert ?",
+    "claim_text": "Bonjour, j'ai participé à une journée circuit samedi avec mon club automobile. J'ai tapé le rail de sécurité en sortie de virage. Les dégâts sont estimés à 1800 euros. Est-ce que c'est couvert ?",
     "claim_amount_eur": 1800,
     "effective_amount_eur": 1800,
-    "scenario": "course/competition non autorisee — reject exclusion explicite (clause 7)",
+    "scenario": "utilisation sur circuit — reject exclusion explicite (clause 6.5, accept 7)",
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "rationale": "epreuve/competition non autorisee par les pouvoirs publics: exclusion generale clause 7",
+    "rationale": "6.5 exclut explicitement l'utilisation sur circuit, quelle que soit l'autorisation de l'evenement; clause 7 cible les competitions soumises a autorisation (categorie differente, egalement acceptable)",
     "expected_flags": [],
     "agent_clause_ids": [
-      "7"
+      "6.5"
     ],
-    "decision_clause_id": "7",
-    "expected_limitation": null
+    "decision_clause_id": "6.5",
+    "expected_limitation": null,
+    "reject_reason": "exclusion"
   },
   {
     "case_id": "golden_16",
@@ -283,7 +333,8 @@
       "6.1"
     ],
     "decision_clause_id": "8.1",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "franchise"
   },
   {
     "case_id": "golden_17",
@@ -299,7 +350,8 @@
     "expected_flags": [],
     "agent_clause_ids": [],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_18",
@@ -315,12 +367,13 @@
     "expected_flags": [],
     "agent_clause_ids": [],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_19",
     "contract_id": 66863,
-    "claim_text": "Bonjour, les inondations de la semaine dernière ont complètement noyé ma voiture qui était garée au sous-sol de mon immeuble, elle ne démarre plus du tout. Le concessionnaire estime la perte totale à 6500 euros. La zone a été reconnue en catastrophe naturelle. Merci de votre aide rapide.",
+    "claim_text": "Bonjour, les inondations de la semaine dernière ont complètement noyé ma voiture qui était garée au sous-sol de mon immeuble, elle ne démarre plus du tout. Le concessionnaire estime la perte totale à 6500 euros. Un arrêté a été publié au Journal Officiel reconnaissant l'état de catastrophe naturelle pour ma commune. Merci de votre aide rapide.",
     "claim_amount_eur": 6500,
     "effective_amount_eur": 6500,
     "scenario": "catastrophe naturelle, low risk, montant > seuil 4000 — escalate sur montant seul",
@@ -333,7 +386,8 @@
       "6.8"
     ],
     "decision_clause_id": "6.8",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_20",
@@ -351,25 +405,32 @@
       "6.5"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_21",
     "contract_id": 6111534,
-    "claim_text": "Bonjour, ma voiture avait été volée il y a trois jours sur un parking, les clés n'étaient pas dans le véhicule. La police l'a retrouvée hier, abandonnée avec quelques dégâts à la carrosserie. Le garage estime les réparations à 750 euros. Comment se passe la prise en charge ?",
+    "claim_text": "Bonjour, ma voiture avait été volée il y a trois jours sur un parking, les clés n'étaient pas dans le véhicule. La police l'a retrouvée hier, abandonnée avec quelques dégâts à la carrosserie. D'ailleurs c'est surtout mon frère qui utilise cette voiture au quotidien, pas moi, mais c'est moi l'assuré principal. Le garage estime les réparations à 750 euros. Comment se passe la prise en charge ?",
     "claim_amount_eur": 750,
     "effective_amount_eur": 750,
-    "scenario": "vol, vehicule retrouve avec degats, cles absentes (pas de limitation 70%) — approve",
+    "scenario": "flag-only escalate (driver_mismatch): vol, vehicule retrouve, cles absentes (pas de limitation 70%)",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "cles non laissees dans le vehicule: pas de limitation 70%; 566 < 750 <= 4000, low risk -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "cles non laissees: pas de limitation; 566 < 750 <= 4000, low risk -> approuverait sans le flag; driver_mismatch valide -> escalate",
+    "expected_flags": [
+      {
+        "flag": "driver_mismatch",
+        "evidence": "D'ailleurs c'est surtout mon frère qui utilise cette voiture au quotidien, pas moi, mais c'est moi l'assuré principal."
+      }
+    ],
     "agent_clause_ids": [
       "6.2"
     ],
     "decision_clause_id": "6.2",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_22",
@@ -377,35 +438,42 @@
     "claim_text": "Bonjour, on m'a volé mon autoradio avec GPS intégré pendant la nuit, la vitre n'a pas été cassée mais la porte était mal verrouillée. Le remplacement coûte 700 euros chez le concessionnaire. Est-ce pris en charge ?",
     "claim_amount_eur": 700,
     "effective_amount_eur": 700,
-    "scenario": "accessoires et amenagements voles — approve",
-    "expected_coverage": "covered",
+    "scenario": "vol d'accessoires seuls sans effraction constatee — reject (condition de garantie non remplie)",
+    "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 561 < 700 <= 4000 -> approve",
+    "expected_decision": "reject",
+    "rationale": "6.6 (et 6.2) n'indemnisent le vol d'accessoires seuls qu'avec des indices serieux d'effraction mecanique/electronique; vitre intacte et porte mal verrouillee ne suffisent pas -> garantie non declenchee",
     "expected_flags": [],
     "agent_clause_ids": [
       "6.6"
     ],
     "decision_clause_id": "6.6",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "condition_not_met"
   },
   {
     "case_id": "golden_23",
     "contract_id": 3152566,
-    "claim_text": "Bonjour, j'ai retrouvé ma voiture rayée sur toute la portière ce matin, visiblement avec une clé ou un objet pointu, sur le parking de mon travail. Le garage évalue la réparation à 500 euros. C'est pris en charge ?",
+    "claim_text": "Bonjour, j'ai retrouvé ma voiture rayée sur toute la portière ce matin, visiblement avec une clé ou un objet pointu, sur le parking de mon travail. En fait c'est tout petit, ça se voit à peine. Le garage évalue la réparation à 500 euros. C'est pris en charge ?",
     "claim_amount_eur": 500,
     "effective_amount_eur": 500,
-    "scenario": "vandalisme (dommages tous accidents) — approve",
+    "scenario": "flag-only escalate (amount_vs_damage): vandalisme (dommages tous accidents)",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 338 < 500 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "338 < 500 <= 4000, low risk -> approuverait sans le flag; amount_vs_damage valide -> escalate",
+    "expected_flags": [
+      {
+        "flag": "amount_vs_damage",
+        "evidence": "En fait c'est tout petit, ça se voit à peine."
+      }
+    ],
     "agent_clause_ids": [
       "6.5"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_24",
@@ -424,25 +492,27 @@
       "12"
     ],
     "decision_clause_id": "6.4",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "formule_gap"
   },
   {
     "case_id": "golden_25",
     "contract_id": 1150404,
-    "claim_text": "Bonjour, mon fils a pris ma voiture pour aller chercher des amis, il n'a que 16 ans et n'a pas encore son permis. Il a eu un accrochage avec un lampadaire, les dégâts sont estimés à 1600 euros. Est-ce que c'est pris en charge ?",
+    "claim_text": "Bonjour, j'ai laissé mon fils prendre ma voiture pour aller chercher des amis, il n'a que 16 ans et n'a pas encore son permis. Il a eu un accrochage avec un lampadaire, les dégâts sont estimés à 1600 euros. Est-ce que c'est pris en charge ?",
     "claim_amount_eur": 1600,
     "effective_amount_eur": 1600,
     "scenario": "conducteur sans permis valide — reject exclusion explicite (clause 7)",
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "rationale": "conducteur sans certificat/permis valide: exclusion generale clause 7 (pas de vol ni usage a l'insu du souscripteur, donc l'exception ne s'applique pas)",
+    "rationale": "conducteur sans permis valide, utilisation avec l'accord explicite du souscripteur (\"j'ai laisse\"): pas d'usage a l'insu, l'exception de l'article R211-10 ne s'applique pas -> exclusion clause 7",
     "expected_flags": [],
     "agent_clause_ids": [
       "7"
     ],
     "decision_clause_id": "7",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "exclusion"
   },
   {
     "case_id": "golden_26",
@@ -460,7 +530,8 @@
       "6.5"
     ],
     "decision_clause_id": "8.1",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "franchise"
   },
   {
     "case_id": "golden_27",
@@ -468,15 +539,18 @@
     "claim_text": "Bonjour, j'ai eu un accident avec une autre voiture à une intersection hier, on n'est pas vraiment d'accord sur qui avait la priorité. Ma voiture est endommagée à l'avant. Comment ça se passe pour la prise en charge ?",
     "claim_amount_eur": null,
     "effective_amount_eur": null,
-    "scenario": "responsabilite disputee et montant absent — ask_info",
-    "expected_coverage": "missing_info",
+    "scenario": "distracteur: la responsabilite disputee est indifferente pour 6.5 (garantie 1ere partie); seul le montant (code) bloque — ask_info",
+    "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "rationale": "responsabilite non etablie et montant absent: impossible de determiner la garantie applicable (RC vs dommages tous accidents) et le calcul franchise/seuil",
+    "rationale": "6.5 couvre les dommages du vehicule assure quelle que soit la responsabilite; la dispute de priorite est un distracteur. Montant absent -> ask_info (code, rule B1)",
     "expected_flags": [],
-    "agent_clause_ids": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_28",
@@ -492,7 +566,8 @@
     "expected_flags": [],
     "agent_clause_ids": [],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_29",
@@ -510,48 +585,56 @@
       "4.1.2"
     ],
     "decision_clause_id": "4.1.2",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_30",
-    "contract_id": 3151415,
-    "claim_text": "Bonjour, ma voiture a pris feu dans mon garage cette nuit à cause d'un problème électrique sur la batterie. Elle est totalement détruite, le concessionnaire évalue la perte à 9000 euros. Merci de votre aide rapide.",
-    "claim_amount_eur": 9000,
-    "effective_amount_eur": 9000,
-    "scenario": "incendie, risque high, montant eleve — escalate sur montant ET risque",
-    "expected_coverage": "covered",
-    "expected_risk_bucket": "high",
-    "expected_decision": "escalate",
-    "rationale": "754 < 9000, 9000 > seuil 4000 et risque high -> escalate (double declencheur)",
+    "contract_id": 4180874,
+    "claim_text": "Bonjour, j'ai eu un accident hier soir en rentrant d'une soirée, j'avais bu plusieurs verres avant de prendre le volant. J'ai heurté un poteau et ma voiture est bien abîmée à l'avant. Le contrôle d'alcoolémie était positif. Le garage évalue les dégâts à 2800 euros. Est-ce pris en charge ?",
+    "claim_amount_eur": 2800,
+    "effective_amount_eur": 2800,
+    "scenario": "dommages sous emprise d'alcool (taux positif) — reject exclusion explicite (clause 6.5)",
+    "expected_coverage": "not_covered",
+    "expected_risk_bucket": "low",
+    "expected_decision": "reject",
+    "rationale": "6.5 exclut les dommages subis par le vehicule lorsque le conducteur conduit sous l'empire d'un etat alcoolique (controle positif); exclusion garantie-specifique, pas clause 7",
     "expected_flags": [],
     "agent_clause_ids": [
-      "6.4"
+      "6.5"
     ],
-    "decision_clause_id": "6.4",
-    "expected_limitation": null
+    "decision_clause_id": "6.5",
+    "expected_limitation": null,
+    "reject_reason": "exclusion"
   },
   {
     "case_id": "golden_31",
     "contract_id": 3169849,
-    "claim_text": "Bonjour, ma voiture était garée dans la rue lors de l'attentat qui a eu lieu la semaine dernière dans le centre-ville, elle a été endommagée par l'explosion. Le garage évalue les réparations à 900 euros. Est-ce pris en charge ?",
+    "claim_text": "Bonjour, ma voiture était garée dans la rue lors de l'attentat qui a eu lieu la semaine dernière dans le centre-ville, elle a été endommagée par l'explosion. Le garage évalue les réparations à 900 euros. J'ai vraiment besoin que ce soit traité en urgence, un ami proche travaille dans votre service clients et m'a assuré que ça irait vite. Est-ce pris en charge ?",
     "claim_amount_eur": 900,
     "effective_amount_eur": 900,
-    "scenario": "attentat/acte de terrorisme (nouveau type de peril) — approve",
+    "scenario": "flag-only escalate (payment_pressure): attentat/acte de terrorisme",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 366 < 900 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "366 < 900 <= 4000, low risk -> approuverait sans le flag; payment_pressure valide -> escalate",
+    "expected_flags": [
+      {
+        "flag": "payment_pressure",
+        "evidence": "J'ai vraiment besoin que ce soit traité en urgence, un ami proche travaille dans votre service clients et m'a assuré que ça irait vite."
+      }
+    ],
     "agent_clause_ids": [
       "6.3"
     ],
     "decision_clause_id": "6.3",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_32",
     "contract_id": 4116228,
-    "claim_text": "Bonjour, ma voiture a été volée il y a deux semaines et n'a toujours pas été retrouvée par la police. Le concessionnaire l'estime à 3200 euros. Comment se passe l'indemnisation ?",
+    "claim_text": "Bonjour, ma voiture a été volée il y a deux semaines et n'a toujours pas été retrouvée par la police. Je possède toujours les deux clés. Le concessionnaire l'estime à 3200 euros. Comment se passe l'indemnisation ?",
     "claim_amount_eur": 3200,
     "effective_amount_eur": 3200,
     "scenario": "vol, vehicule non retrouve, perte totale — approve",
@@ -564,25 +647,32 @@
       "6.2"
     ],
     "decision_clause_id": "6.2",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_33",
     "contract_id": 2188154,
-    "claim_text": "Bonjour, j'ai heurté le trottoir en me garant et le pare-chocs avant est fissuré. Le garage me propose de le remplacer pour 550 euros. C'est pris en charge ?",
+    "claim_text": "Bonjour, j'ai heurté le trottoir en me garant et le pare-chocs avant est fissuré. C'est le diesel que j'ai acheté il y a quelques années. Le garage me propose de le remplacer pour 550 euros. C'est pris en charge ?",
     "claim_amount_eur": 550,
     "effective_amount_eur": 550,
-    "scenario": "dommages tous accidents, minime — approve",
+    "scenario": "flag-only escalate (vehicle_mismatch): dommages tous accidents, minime (vrai veh_gas=essence)",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 305 < 550 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "305 < 550 <= 4000, low risk -> approuverait sans le flag; vehicle_mismatch valide (contrat=essence, texte dit diesel) -> escalate",
+    "expected_flags": [
+      {
+        "flag": "vehicle_mismatch",
+        "evidence": "C'est le diesel que j'ai acheté il y a quelques années."
+      }
+    ],
     "agent_clause_ids": [
       "6.5"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_34",
@@ -601,7 +691,8 @@
       "12"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "formule_gap"
   },
   {
     "case_id": "golden_35",
@@ -609,17 +700,18 @@
     "claim_text": "Bonjour, j'ai eu un incendie dans ma voiture après le transport de bidons d'essence à l'arrière pour ravitailler mon groupe électrogène, environ 30 litres. Les dégâts sont estimés à 2200 euros. Est-ce pris en charge ?",
     "claim_amount_eur": 2200,
     "effective_amount_eur": 2200,
-    "scenario": "transport de matieres inflammables ayant provoque le sinistre — reject exclusion explicite (clause 7)",
-    "expected_coverage": "not_covered",
+    "scenario": "near-miss exclusion: transport de carburant dans la tolerance legale (500kg/600L) — approve",
+    "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "reject",
-    "rationale": "30L d'essence transportee depasse le seuil de 500kg/600L tolere; matiere inflammable ayant provoque le sinistre -> exclusion clause 7",
+    "expected_decision": "approve",
+    "rationale": "30L reste dans la tolerance de l'article R211-11 (jusqu'a 500kg/600L); l'exclusion clause 7 ne s'applique pas. 733 < 2200 <= 4000, low risk -> approve",
     "expected_flags": [],
     "agent_clause_ids": [
-      "7"
+      "6.4"
     ],
-    "decision_clause_id": "7",
-    "expected_limitation": null
+    "decision_clause_id": "6.4",
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_36",
@@ -635,7 +727,8 @@
     "expected_flags": [],
     "agent_clause_ids": [],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_37",
@@ -643,20 +736,23 @@
     "claim_text": "Bonjour, j'ai eu un accident avec un cycliste hier, je ne suis pas certain d'être responsable, il n'a pas voulu échanger nos informations. Ma voiture a quelques dégâts à l'avant. Qu'est-ce que je dois faire ?",
     "claim_amount_eur": null,
     "effective_amount_eur": null,
-    "scenario": "responsabilite incertaine, tiers non identifie, montant absent — ask_info",
-    "expected_coverage": "missing_info",
+    "scenario": "distracteur: la responsabilite incertaine est indifferente pour 6.5; seul le montant (code) bloque — ask_info",
+    "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "ask_info",
-    "rationale": "responsabilite non etablie (RC vs dommages tous accidents) et montant absent",
+    "rationale": "6.5 couvre les dommages du vehicule assure quelle que soit la responsabilite; le tiers non identifie est un distracteur. Montant absent -> ask_info (code, rule B1)",
     "expected_flags": [],
-    "agent_clause_ids": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_38",
     "contract_id": 149553,
-    "claim_text": "Bonjour, une explosion est survenue dans l'usine chimique près de chez moi hier, ma voiture garée dans la rue a été endommagée par l'onde de choc. La zone a été reconnue en état de catastrophe technologique par la préfecture. Le garage évalue les dégâts à 5200 euros.",
+    "claim_text": "Bonjour, une explosion est survenue dans l'usine chimique près de chez moi hier, ma voiture garée dans la rue a été endommagée par l'onde de choc. La décision de l'autorité administrative a été publiée au Journal Officiel, reconnaissant l'état de catastrophe technologique. Le garage évalue les dégâts à 5200 euros.",
     "claim_amount_eur": 5200,
     "effective_amount_eur": 5200,
     "scenario": "catastrophe technologique (nouveau type de peril), risque medium, montant > seuil — escalate sur montant seul",
@@ -669,7 +765,8 @@
       "6.9"
     ],
     "decision_clause_id": "6.9",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_39",
@@ -687,7 +784,8 @@
       "6.2"
     ],
     "decision_clause_id": "6.2",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_40",
@@ -705,80 +803,89 @@
       "6.5"
     ],
     "decision_clause_id": "6.5",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_41",
     "contract_id": 1055283,
-    "claim_text": "Bonjour, ma maison et ma rue ont été inondées par la crue de la semaine dernière, ma voiture garée devant chez moi a été endommagée par l'eau. Ma commune a été classée en catastrophe naturelle par arrêté préfectoral. Le garage estime les dégâts à 1900 euros.",
+    "claim_text": "Bonjour, ma maison et ma rue ont été inondées par la crue de la semaine dernière, ma voiture garée devant chez moi a été endommagée par l'eau. Un arrêté interministériel a été publié au Journal Officiel reconnaissant l'état de catastrophe naturelle pour ma commune. L'eau est juste montée un peu au niveau des pneus, rien de spectaculaire à voir, mais le garage me demande 1900 euros pour tout refaire.",
     "claim_amount_eur": 1900,
     "effective_amount_eur": 1900,
-    "scenario": "catastrophe naturelle, declaration officielle confirmee — approve",
+    "scenario": "flag-only escalate (amount_vs_damage): catastrophe naturelle, decret publie",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 524 < 1900 <= 4000 -> approve",
-    "expected_flags": [],
+    "expected_decision": "escalate",
+    "rationale": "524 < 1900 <= 4000, low risk -> approuverait sans le flag; amount_vs_damage valide -> escalate",
+    "expected_flags": [
+      {
+        "flag": "amount_vs_damage",
+        "evidence": "L'eau est juste montée un peu au niveau des pneus, rien de spectaculaire à voir, mais le garage me demande 1900 euros pour tout refaire."
+      }
+    ],
     "agent_clause_ids": [
       "6.8"
     ],
     "decision_clause_id": "6.8",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_42",
-    "contract_id": 5109280,
-    "claim_text": "Bonjour, un caillou projeté par un camion a fissuré mon pare-brise sur la nationale ce matin. Le garage me propose de le remplacer pour 650 euros. C'est pris en charge ?",
-    "claim_amount_eur": 650,
-    "effective_amount_eur": 650,
-    "scenario": "bris de glace — approve",
-    "expected_coverage": "covered",
+    "contract_id": 2261134,
+    "claim_text": "Bonjour, le rétroviseur extérieur côté passager de ma voiture a été cassé, la vitre est en morceaux, probablement un accrochage sur un parking. Le garage me propose de le remplacer pour 350 euros. C'est pris en charge par le bris de glace ?",
+    "claim_amount_eur": 350,
+    "effective_amount_eur": 350,
+    "scenario": "vitre de retroviseur exterieur cassee — reject exclusion explicite (clause 6.1)",
+    "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 490 < 650 <= 4000 -> approve",
+    "expected_decision": "reject",
+    "rationale": "6.1 exclut explicitement les miroirs des retroviseurs exterieurs de la garantie bris de glace",
     "expected_flags": [],
     "agent_clause_ids": [
       "6.1"
     ],
     "decision_clause_id": "6.1",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "exclusion"
   },
   {
     "case_id": "golden_43",
     "contract_id": 1008814,
-    "claim_text": "Bonjour, on m'a volé les enjoliveurs et l'autoradio de ma voiture pendant la nuit sur mon parking. Le remplacement coûte 800 euros chez le concessionnaire. Est-ce couvert ?",
+    "claim_text": "Bonjour, on m'a volé les enjoliveurs et l'autoradio de ma voiture pendant la nuit sur mon parking, la vitre était brisée et la serrure de la portière forcée. Le remplacement coûte 800 euros chez le concessionnaire. Est-ce couvert ?",
     "claim_amount_eur": 800,
     "effective_amount_eur": 800,
-    "scenario": "accessoires et amenagements voles — approve",
+    "scenario": "accessoires et amenagements voles, effraction constatee (vitre brisee, serrure forcee) — approve",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
-    "rationale": "tous_risques, low risk, 524 < 800 <= 4000 -> approve",
+    "rationale": "effraction manifeste constatee (vitre + serrure), condition de 6.6 remplie; tous_risques, low risk, 524 < 800 <= 4000 -> approve",
     "expected_flags": [],
     "agent_clause_ids": [
       "6.6"
     ],
     "decision_clause_id": "6.6",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_44",
-    "contract_id": 1142245,
-    "claim_text": "Bonjour, ma voiture a été volée cette nuit devant mon domicile, elle n'a pas été retrouvée, le concessionnaire l'estime à 2500 euros. Comment se passe l'indemnisation ?",
-    "claim_amount_eur": 2500,
-    "effective_amount_eur": 2500,
-    "scenario": "vol sous formule tiers (liability-only) — reject formule-gap",
-    "expected_coverage": "not_covered",
+    "contract_id": 4082391,
+    "claim_text": "Bonjour, je me suis arrêté deux minutes devant la boulangerie en laissant le moteur tourner, et quand je suis sorti la voiture avait disparu. Le concessionnaire l'estime à 3000 euros. Que dois-je faire ?",
+    "claim_amount_eur": 3000,
+    "effective_amount_eur": 2100,
+    "scenario": "vol, cles implicites (moteur laisse tourner) — limitation 70% inferee sans declaration explicite",
+    "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "reject",
-    "rationale": "formule=tiers (liability-only) ne couvre pas le vol du vehicule du souscripteur",
+    "expected_decision": "approve",
+    "rationale": "moteur tournant implique les cles sur le contact; limitation 70% (clause 6.2) meme sans declaration explicite. 3000*0.7=2100; 391 < 2100 <= 4000, low risk -> approve",
     "expected_flags": [],
     "agent_clause_ids": [
-      "6.2",
-      "12"
+      "6.2"
     ],
     "decision_clause_id": "6.2",
-    "expected_limitation": null
+    "expected_limitation": "keys_in_vehicle",
+    "reject_reason": null
   },
   {
     "case_id": "golden_45",
@@ -796,25 +903,27 @@
       "7"
     ],
     "decision_clause_id": "7",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": "exclusion"
   },
   {
     "case_id": "golden_46",
-    "contract_id": 2070869,
-    "claim_text": "Bonjour, un gravillon a fait un petit impact sur mon pare-brise, pas de fissure qui traverse, juste un impact à réparer. Le garage me propose 450 euros pour la réparation. Est-ce remboursé ?",
-    "claim_amount_eur": 450,
-    "effective_amount_eur": 450,
-    "scenario": "montant sous la franchise (556) — reject franchise",
+    "contract_id": 6030530,
+    "claim_text": "Bonjour, ma voiture a été volée cette nuit dans mon garage privé, les clés étaient restées sur le contact. Les voleurs ont forcé la porte du garage pour y accéder. Le concessionnaire l'estime à 1200 euros. Comment se passe l'indemnisation ?",
+    "claim_amount_eur": 1200,
+    "effective_amount_eur": 1200,
+    "scenario": "vol, cles sur le contact MAIS effraction du garage prive — exception, pas de limitation 70%",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
-    "expected_decision": "reject",
-    "rationale": "couvert en principe mais 450 <= franchise 556: reject citant la clause franchise",
+    "expected_decision": "approve",
+    "rationale": "clause 6.2: la limitation 70% ne s'applique pas lorsque le vol survient apres effraction du domicile/garage prive; ici effraction constatee -> montant plein. 381 < 1200 <= 4000, low risk -> approve",
     "expected_flags": [],
     "agent_clause_ids": [
-      "6.1"
+      "6.2"
     ],
-    "decision_clause_id": "8.1",
-    "expected_limitation": null
+    "decision_clause_id": "6.2",
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_47",
@@ -828,9 +937,12 @@
     "expected_decision": "approve",
     "rationale": "6.1 couvre le bris de vitre quelle que soit la cause; l'ambiguite accident/vandalisme/vol est un distracteur, pas un blocage reel. 700 < 900 <= 4000, low risk -> approve",
     "expected_flags": [],
-    "agent_clause_ids": ["6.1"],
+    "agent_clause_ids": [
+      "6.1"
+    ],
     "decision_clause_id": "6.1",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_48",
@@ -846,7 +958,8 @@
     "expected_flags": [],
     "agent_clause_ids": [],
     "decision_clause_id": null,
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_49",
@@ -864,24 +977,66 @@
       "6.4"
     ],
     "decision_clause_id": "6.4",
-    "expected_limitation": null
+    "expected_limitation": null,
+    "reject_reason": null
   },
   {
     "case_id": "golden_50",
-    "contract_id": 3210017,
-    "claim_text": "Bonjour, on m'a volé ma voiture cette nuit sur le parking de mon travail, les clés étaient restées sur le contact. Elle n'a pas été retrouvée. Le concessionnaire l'estime à 10000 euros. Que dois-je faire ?",
-    "claim_amount_eur": 10000,
-    "effective_amount_eur": 7000,
-    "scenario": "vol avec cles laissees sur le contact (limitation 70%, clause 6.2), risque high, montant eleve — escalate sur montant ET risque",
-    "expected_coverage": "covered",
-    "expected_risk_bucket": "high",
-    "expected_decision": "escalate",
-    "rationale": "couvert mais limite a 70% (10000*0.7=7000) par clause 6.2; 7000 > franchise 525 et > seuil 4000, et risque high -> escalate (double declencheur)",
+    "contract_id": 3006793,
+    "claim_text": "Bonjour, j'ai crevé un pneu en roulant sur un nid de poule, le pneu est inutilisable. Aucun autre dégât sur la voiture. Le garage me propose un pneu neuf pour 180 euros. C'est remboursé par les dommages tous accidents ?",
+    "claim_amount_eur": 180,
+    "effective_amount_eur": 180,
+    "scenario": "dommage pneumatique seul, aucune autre piece affectee — reject exclusion explicite (clause 6.5)",
+    "expected_coverage": "not_covered",
+    "expected_risk_bucket": "low",
+    "expected_decision": "reject",
+    "rationale": "6.5 exclut les dommages aux pneumatiques sauf consequence d'un accident affectant d'autres parties; ici seul le pneu est touche -> exclusion",
     "expected_flags": [],
     "agent_clause_ids": [
-      "6.2"
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null,
+    "reject_reason": "exclusion"
+  },
+  {
+    "case_id": "golden_51",
+    "contract_id": 1080015,
+    "claim_text": "Bonjour, ma voiture a été volée hier soir devant chez moi, toujours pas retrouvée. Le concessionnaire l'estime à 4500 euros. Comment ça se passe ?",
+    "claim_amount_eur": 4500,
+    "effective_amount_eur": 4500,
+    "scenario": "vol sous formule tiers, profil a risque eleve — reject formule-gap (teste la precedence: not_covered devant escalate)",
+    "expected_coverage": "not_covered",
+    "expected_risk_bucket": "high",
+    "expected_decision": "reject",
+    "rationale": "formule=tiers ne couvre pas le vol, quel que soit le niveau de risque ou le montant; not_covered precede toute condition d'escalade -> reject malgre risque high et montant eleve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.2",
+      "12"
     ],
     "decision_clause_id": "6.2",
-    "expected_limitation": "keys_in_vehicle"
+    "expected_limitation": null,
+    "reject_reason": "formule_gap"
+  },
+  {
+    "case_id": "golden_52",
+    "contract_id": 10482,
+    "claim_text": "Bonjour, j'ai eu un accident hier, j'ai perdu le contrôle sur une route glissante et percuté un arbre. Ma voiture est bien abîmée, les dégâts sont estimés à 3800 euros. Comment se passe la prise en charge ?",
+    "claim_amount_eur": 3800,
+    "effective_amount_eur": 3800,
+    "scenario": "dommages tous accidents sous formule tiers, profil a risque eleve — reject formule-gap (teste la precedence)",
+    "expected_coverage": "not_covered",
+    "expected_risk_bucket": "high",
+    "expected_decision": "reject",
+    "rationale": "formule=tiers ne couvre pas les dommages au vehicule du souscripteur, quel que soit le risque; not_covered precede l'escalade -> reject malgre risque high",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5",
+      "12"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null,
+    "reject_reason": "formule_gap"
   }
 ]
