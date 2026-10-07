@@ -4,11 +4,11 @@ import json
 import sqlite3
 
 import joblib
-import pandas as pd
 import pytest
 from mcp.server.mcpserver.exceptions import ToolError
 
 import config
+from data.load_contracts import load_contracts
 from mcp_server.server import create_server
 
 EXISTING_CONTRACT_ID = 1
@@ -69,11 +69,7 @@ def test_unknown_contract_id_fails_loudly_at_startup():
 
 async def test_risk_score_matches_training_style_prediction():
     """Catches serving-time feature construction silently diverging from training."""
-    conn = sqlite3.connect(config.CONTRACTS_DB)
-    df = pd.read_sql("SELECT * FROM contracts", conn)
-    conn.close()
-    for col in config.CATEGORICAL:
-        df[col] = df[col].astype("category")
+    df = load_contracts()
     row = df[df["contract_id"] == EXISTING_CONTRACT_ID]
 
     model = joblib.load(config.RISK_MODEL_PATH)

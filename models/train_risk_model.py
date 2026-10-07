@@ -1,6 +1,5 @@
 """Train the risk model: claims/year via Poisson HGB, vs a predict-the-mean baseline."""
 
-import sqlite3
 import sys
 from pathlib import Path
 
@@ -8,26 +7,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import joblib
 import numpy as np
-import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.metrics import mean_poisson_deviance
 from sklearn.model_selection import train_test_split
 
 import config
-
-
-def _load_data() -> pd.DataFrame:
-    conn = sqlite3.connect(config.CONTRACTS_DB)
-    df = pd.read_sql("SELECT * FROM contracts", conn)
-    conn.close()
-    for col in config.CATEGORICAL:
-        df[col] = df[col].astype("category")
-    return df
+from data.load_contracts import load_contracts
 
 
 def train() -> None:
     """Fit the model, compare to a predict-the-mean baseline, save only if it wins."""
-    df = _load_data()
+    df = load_contracts()
     target = df["claim_nb"] / df["exposure"]
 
     train_df, test_df, train_y, test_y = train_test_split(

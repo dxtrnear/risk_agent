@@ -22,3 +22,17 @@ GEMINI_EMBEDDING_MODEL = "gemini-embedding-001"
 
 RANDOM_SEED = 42
 HOLDOUT_FRACTION = 0.2
+
+# "Large amount" escalation cutoff. freMTPL2sev (OpenML data_id=41215, real claim
+# severities): 4000 EUR sits at the 93.7th percentile, i.e. this escalates the top
+# ~6.3% of claims by amount alone.
+CLAIM_AMOUNT_THRESHOLD_EUR = 4000
+
+# Risk bucket from a Poisson tail probability, not a raw ratio: p = P(seeing at
+# least this many HISTORICAL claims | this contract's expected rate). "Actual
+# claims" is the contract's recorded claim_nb -- history, never counting the claim
+# currently being filed. A ratio-based bucket was tried first and rejected: it
+# collapsed to "has ever claimed" (one claim vs. ~0.05 expected always reads as a
+# huge ratio), leaving the model's actual per-contract rate irrelevant.
+RISK_P_LOW_MIN = 0.05  # p >= this -> low (this many claims is unsurprising)
+RISK_P_MEDIUM_MIN = 0.005  # p >= this (but < LOW_MIN) -> medium; below -> high
