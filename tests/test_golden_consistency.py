@@ -20,6 +20,7 @@ import config
 GOLDEN_PATH = config.ROOT / "evals" / "golden" / "golden.json"
 _ALL_COVERS = config.FORMULE_COVERAGES.values()
 KNOWN_COVER_CLAUSES = {cid for covers in _ALL_COVERS for cid in covers}
+RejectReason = Literal["formule_gap", "exclusion", "condition_not_met", "franchise"]
 
 
 class ExpectedFlag(BaseModel):
@@ -42,6 +43,7 @@ class GoldenCase(BaseModel):
     agent_clause_ids: list[str]
     decision_clause_id: str | None
     expected_limitation: Literal["keys_in_vehicle"] | None
+    reject_reason: RejectReason | None
 
 
 def _load_cases() -> list[GoldenCase]:
@@ -164,10 +166,13 @@ def test_agent_clause_ids_match_formule(case: GoldenCase):
     subscribed = config.FORMULE_COVERAGES[contract["formule"]]
     cover_clauses = [c for c in case.agent_clause_ids if c in KNOWN_COVER_CLAUSES]
 
+    not_covered = case.expected_coverage == "not_covered"
+    is_formule_gap = not_covered and case.reject_reason == "formule_gap"
+
     if case.expected_coverage == "covered" and cover_clauses:
         msg = f"{case.case_id}: covered, {cover_clauses} not in formule's {subscribed}"
         assert any(c in subscribed for c in cover_clauses), msg
-    elif case.expected_coverage == "not_covered":
+    elif is_formule_gap:
         wrongly_included = [c for c in cover_clauses if c in subscribed]
         msg = f"{case.case_id}: not_covered but {wrongly_included} is subscribed"
         assert not wrongly_included, msg
@@ -181,3 +186,13 @@ def test_no_duplicate_contract_ids():
 def test_no_duplicate_case_ids():
     ids = [c.case_id for c in CASES]
     assert len(ids) == len(set(ids)), "duplicate case_id in golden.json"
+
+
+@pytest.mark.parametrize("case", CASES, ids=[c.case_id for c in CASES])
+def test_reject_reason_consistency(case: GoldenCase):
+    if case.expected_decision == "reject":
+        msg = f"{case.case_id}: reject with no reject_reason"
+        assert case.reject_reason is not None, msg
+    else:
+        msg = f"{case.case_id}: not reject but has reject_reason"
+        assert case.reject_reason is None, msg
