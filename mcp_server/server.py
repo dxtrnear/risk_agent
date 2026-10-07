@@ -66,9 +66,14 @@ def create_server(contract_id: int, search_fn=default_search) -> MCPServer:
     @server.tool()
     def get_contract() -> dict:
         """Return the current customer's contract: coverage tier (formule), deductible
-        (franchise), vehicle and driver profile, and past claim count. Takes no
-        arguments — always returns the contract bound to this session."""
-        return dict(contract)
+        (franchise), vehicle and driver profile, past claim count, and
+        subscribed_covers (the list of clause_ids actually included in this formule
+        -- use it to tell what this contract covers without guessing from the
+        formule name alone). Takes no arguments — always returns the contract bound
+        to this session."""
+        result = dict(contract)
+        result["subscribed_covers"] = config.FORMULE_COVERAGES[contract["formule"]]
+        return result
 
     @server.tool()
     def risk_score() -> dict:

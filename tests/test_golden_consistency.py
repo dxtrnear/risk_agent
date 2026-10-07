@@ -18,6 +18,8 @@ from scipy.stats import poisson
 import config
 
 GOLDEN_PATH = config.ROOT / "evals" / "golden" / "golden.json"
+_ALL_COVERS = config.FORMULE_COVERAGES.values()
+KNOWN_COVER_CLAUSES = {cid for covers in _ALL_COVERS for cid in covers}
 
 
 class ExpectedFlag(BaseModel):
@@ -154,6 +156,21 @@ def test_decision_matches_table(case: GoldenCase):
     expected = case.expected_decision
     msg = f"{case.case_id}: table={recomputed!r}, expects={expected!r} ({detail})"
     assert recomputed == expected, msg
+
+
+@pytest.mark.parametrize("case", CASES, ids=[c.case_id for c in CASES])
+def test_agent_clause_ids_match_formule(case: GoldenCase):
+    contract = _fetch_contract_row(case.contract_id)
+    subscribed = config.FORMULE_COVERAGES[contract["formule"]]
+    cover_clauses = [c for c in case.agent_clause_ids if c in KNOWN_COVER_CLAUSES]
+
+    if case.expected_coverage == "covered" and cover_clauses:
+        msg = f"{case.case_id}: covered, {cover_clauses} not in formule's {subscribed}"
+        assert any(c in subscribed for c in cover_clauses), msg
+    elif case.expected_coverage == "not_covered":
+        wrongly_included = [c for c in cover_clauses if c in subscribed]
+        msg = f"{case.case_id}: not_covered but {wrongly_included} is subscribed"
+        assert not wrongly_included, msg
 
 
 def test_no_duplicate_contract_ids():

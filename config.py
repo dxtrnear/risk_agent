@@ -71,7 +71,29 @@ AGENT_TIMEOUT_SECONDS = 30  # wall-clock budget for one agent's full loop
 
 # formule -> list of garantie clause_ids included in that tier. Clause 12's table
 # lost its cell structure during PDF extraction (header row and data row text got
-# flattened together), so this is NOT inferred from it -- user reads the real table
-# from the PDF directly and provides this mapping. Placeholder until then; nothing
-# should import/use this until it's filled in.
-FORMULE_COVERAGES: dict[str, list[str]] = {}
+# flattened together), so this was read directly from the PDF (p.71) by hand, not
+# inferred. Maps to AXA's real tiers: tiers->"Tiers Mini", tiers_etendu->"Tiers
+# Étendue", tous_risques->"Tous risques Équilibre". "En option" columns don't count
+# as included. 6.6 (Accessoires) is "en option" in every real AXA formule -- our
+# tous_risques contracts are ASSUMED to have subscribed it (an assumption about our
+# synthetic data, not something the table itself says). 5.2.4 (Contenu du véhicule)
+# is an option nobody has subscribed in our data -- it's in no formule's list.
+FORMULE_COVERAGES: dict[str, list[str]] = {
+    "tiers": ["4.1.2", "4.2", "5.1"],
+    "tiers_etendu": ["4.1.2", "4.2", "5.1", "6.1", "6.2", "6.3", "6.4", "6.8", "6.9", "6.10"],
+    "tous_risques": [
+        "4.1.2",
+        "4.2",
+        "5.1",
+        "6.1",
+        "6.2",
+        "6.3",
+        "6.4",
+        "6.5",
+        "6.6",
+        "6.7",
+        "6.8",
+        "6.9",
+        "6.10",
+    ],
+}
