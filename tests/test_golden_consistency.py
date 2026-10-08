@@ -188,6 +188,25 @@ def test_no_duplicate_case_ids():
     assert len(ids) == len(set(ids)), "duplicate case_id in golden.json"
 
 
+# Each entry asserts that the named case's contract data genuinely contradicts its
+# flag's evidence -- not just that the evidence quote exists in the claim text.
+# Hardcoded per case_id (not a generic text-vs-contract matcher): each contradiction
+# is authored by hand, so what it should contradict is known at write time.
+CONTRACT_FLAG_CONTRADICTIONS = {
+    "golden_13": lambda c: c["veh_gas"] != "Diesel",
+    "golden_33": lambda c: c["veh_age"] >= 5,
+    "golden_54": lambda c: c["driv_age"] < 45,
+}
+
+
+def test_contract_based_flags_contradict_contract():
+    for case_id, check in CONTRACT_FLAG_CONTRADICTIONS.items():
+        case = next(c for c in CASES if c.case_id == case_id)
+        contract = _fetch_contract_row(case.contract_id)
+        msg = f"{case_id}: contract data does not actually contradict the flag's evidence"
+        assert check(contract), msg
+
+
 @pytest.mark.parametrize("case", CASES, ids=[c.case_id for c in CASES])
 def test_reject_reason_consistency(case: GoldenCase):
     if case.expected_decision == "reject":
