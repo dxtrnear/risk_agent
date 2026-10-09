@@ -107,7 +107,8 @@ def _decide(
     return "approve", coverage.clause_id
 
 
-def _git_commit_hash() -> str:
+def git_commit_hash() -> str:
+    """Public: also used by evals/run_eval.py to stamp every record."""
     result = subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"],
         cwd=config.ROOT,
@@ -156,7 +157,7 @@ async def triage(
             "coverage_prompt_version": COVERAGE_PROMPT_VERSION,
             "risk_prompt_version": RISK_PROMPT_VERSION,
             "model": config.GEMINI_MODEL_LIGHT,
-            "git_commit": _git_commit_hash(),
+            "git_commit": git_commit_hash(),
         },
     ) as root:
         # Every span created below is explicitly parented via trace_context

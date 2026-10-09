@@ -25,6 +25,9 @@ policy/index.npz
 mlruns/
 mlflow.db
 
+# eval run output (regenerable; promote a specific file to evals/baselines/ to commit it)
+evals/results/
+
 # pytest
 .pytest_cache/
 htmlcov/
