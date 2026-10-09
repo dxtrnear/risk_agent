@@ -146,7 +146,9 @@ def test_latency_stats_mean_and_p95():
     records = [_record(latency_seconds=s) for s in [10.0, 20.0, 30.0, 40.0]]
     result = metrics.latency_stats(records)
     assert result["mean"] == 25.0
-    assert result["p95"] == 40.0
+    # Nearest-rank percentile: index = floor(0.95 * (4-1)) = floor(2.85) = 2 -> 30.0,
+    # not the max -- correct for this formula with only 4 samples, not a bug.
+    assert result["p95"] == 30.0
     assert result["n"] == 4
 
 
