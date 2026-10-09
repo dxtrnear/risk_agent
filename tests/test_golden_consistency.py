@@ -9,13 +9,11 @@ import json
 import sqlite3
 from typing import Literal
 
-import joblib
-import pandas as pd
 import pytest
 from pydantic import BaseModel
-from scipy.stats import poisson
 
 import config
+from models.risk_bucket import compute_risk_bucket
 
 GOLDEN_PATH = config.ROOT / "evals" / "golden" / "golden.json"
 _ALL_COVERS = config.FORMULE_COVERAGES.values()
@@ -67,20 +65,6 @@ def _fetch_contract_row(contract_id: int) -> dict:
     return dict(zip(cols, row))
 
 
-def _risk_bucket(contract: dict) -> str:
-    df = pd.DataFrame([contract])
-    for col in config.CATEGORICAL:
-        df[col] = df[col].astype("category")
-    rate = float(RISK_MODEL.predict(df[config.FEATURES])[0])
-    expected_claims = rate * contract["exposure"]
-    p = poisson.sf(contract["claim_nb"] - 1, expected_claims)
-    if p >= config.RISK_P_LOW_MIN:
-        return "low"
-    if p >= config.RISK_P_MEDIUM_MIN:
-        return "medium"
-    return "high"
-
-
 def _recompute_decision(case: GoldenCase, franchise: float) -> str:
     if case.expected_coverage == "missing_info":
         return "ask_info"
@@ -112,7 +96,6 @@ def _expected_effective_amount(case: GoldenCase) -> float | None:
 
 CASES = _load_cases()
 VALID_CLAUSE_IDS = _load_valid_clause_ids()
-RISK_MODEL = joblib.load(config.RISK_MODEL_PATH)
 
 
 @pytest.mark.parametrize("case", CASES, ids=[c.case_id for c in CASES])
@@ -129,7 +112,7 @@ def test_clause_ids_exist(case: GoldenCase):
 @pytest.mark.parametrize("case", CASES, ids=[c.case_id for c in CASES])
 def test_risk_bucket_matches_model(case: GoldenCase):
     contract = _fetch_contract_row(case.contract_id)
-    actual = _risk_bucket(contract)
+    actual = compute_risk_bucket(contract)
     expected = case.expected_risk_bucket
     msg = f"{case.case_id}: model gives {actual}, case expects {expected}"
     assert actual == expected, msg

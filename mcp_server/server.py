@@ -3,6 +3,7 @@
 import sqlite3
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -64,7 +65,7 @@ def create_server(contract_id: int, search_fn=default_search) -> MCPServer:
     server = MCPServer("claims-triage")
 
     @server.tool()
-    def get_contract() -> dict:
+    def get_contract() -> dict[str, Any]:
         """Return the current customer's contract: coverage tier (formule), deductible
         (franchise), vehicle and driver profile, past claim count, and
         subscribed_covers (the list of clause_ids actually included in this formule
@@ -76,7 +77,7 @@ def create_server(contract_id: int, search_fn=default_search) -> MCPServer:
         return result
 
     @server.tool()
-    def risk_score() -> dict:
+    def risk_score() -> dict[str, Any]:
         """Return the risk model's expected claim frequency for this session's
         contract, as claims per year. This is a rate, not scaled by the contract's
         exposure — scale it yourself before comparing to an actual claim count.
@@ -88,7 +89,7 @@ def create_server(contract_id: int, search_fn=default_search) -> MCPServer:
         return {"expected_claims_per_year": rate}
 
     @server.tool()
-    def search_clauses(query: str, k: int = 3) -> dict:
+    def search_clauses(query: str, k: int = 3) -> dict[str, Any]:
         """Search the policy's conditions générales for clauses relevant to a
         French-language description of a claim or coverage question. Returns up to
         k clauses ranked by relevance, each with its clause_id, title and text. Use

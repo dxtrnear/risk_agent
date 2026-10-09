@@ -69,6 +69,10 @@ RISK_AGENT_TOOLS = ["get_contract", "risk_score"]
 AGENT_STEP_LIMIT = 6  # max LLM turns per agent loop before it fails loudly
 AGENT_TIMEOUT_SECONDS = 30  # wall-clock budget for one agent's full loop
 
+# The clause cited for a franchise-reject is the franchise clause itself, not the
+# coverage clause (e.g. golden_05: agent_clause_ids=["6.5"], decision_clause_id="8.1").
+FRANCHISE_CLAUSE_ID = "8.1"
+
 # formule -> list of garantie clause_ids included in that tier. Clause 12's table
 # lost its cell structure during PDF extraction (header row and data row text got
 # flattened together), so this was read directly from the PDF (p.71) by hand, not
