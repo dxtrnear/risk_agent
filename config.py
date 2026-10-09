@@ -4,6 +4,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 
+# Tagged on every Langfuse trace and MLflow run -- update when the transport
+# actually changes (e.g. to "stage_b" once A2A servers are real), not before.
+PROJECT_STAGE = "stage_a"
+
 RAW_DATA_DIR = ROOT / "data" / "raw"
 CONTRACTS_CSV = ROOT / "data" / "raw" / "contracts_enriched.csv"
 CONTRACTS_DB = ROOT / "data" / "contracts.db"

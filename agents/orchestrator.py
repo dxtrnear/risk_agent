@@ -169,7 +169,7 @@ async def triage(
         # propagate_attributes still uses ambient (baggage) propagation for
         # session_id/tags, which is a separate, more robust mechanism in OTel.
         with propagate_attributes(
-            session_id=run_id, tags=[eval_set, "stage_a"], as_baggage=True
+            session_id=run_id, tags=[eval_set, config.PROJECT_STAGE], as_baggage=True
         ):
             async with stdio_client(params) as (read, write):
                 async with ClientSession(read, write) as session:

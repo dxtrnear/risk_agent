@@ -27,6 +27,9 @@ def _record(**overrides) -> dict:
         "expected_flags": [],
         "coverage_tool_calls": ["get_contract", "search_clauses"],
         "risk_tool_calls": ["get_contract"],
+        "latency_seconds": 10.0,
+        "input_tokens": 1000,
+        "output_tokens": 100,
     }
     base.update(overrides)
     return base
@@ -130,13 +133,39 @@ def test_contract_read_when_needed_only_considers_contract_based_cases():
     assert result == {"rate": 0.5, "k": 1, "n": 2}
 
 
-def test_contract_read_rate_coverage():
+def test_contract_read_coverage_rate():
     records = [
         _record(coverage_tool_calls=["get_contract", "search_clauses"]),
         _record(coverage_tool_calls=["search_clauses"]),
     ]
-    result = metrics.contract_read_rate_coverage(records)
+    result = metrics.contract_read_coverage_rate(records)
     assert result == {"rate": 0.5, "k": 1, "n": 2}
+
+
+def test_latency_stats_mean_and_p95():
+    records = [_record(latency_seconds=s) for s in [10.0, 20.0, 30.0, 40.0]]
+    result = metrics.latency_stats(records)
+    assert result["mean"] == 25.0
+    assert result["p95"] == 40.0
+    assert result["n"] == 4
+
+
+def test_latency_stats_excludes_missing_values():
+    records = [_record(latency_seconds=10.0), _record(latency_seconds=None)]
+    result = metrics.latency_stats(records)
+    assert result["n"] == 1
+    assert result["mean"] == 10.0
+
+
+def test_token_cost_stats_excludes_error_records():
+    records = [
+        _record(input_tokens=1000, output_tokens=100),
+        _record(error="boom", input_tokens=None, output_tokens=None),
+    ]
+    result = metrics.token_cost_stats(records)
+    assert result["n"] == 1
+    assert result["mean_input_tokens"] == 1000
+    assert result["mean_output_tokens"] == 100
 
 
 def test_retrieval_hit_rate_and_cited_clause_retrieved():

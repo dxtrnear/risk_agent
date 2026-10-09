@@ -124,12 +124,12 @@ def evidence_exists_rate(records: list[dict]) -> Rate:
     return _rate(validated, validated + dropped)
 
 
-def contract_read_rate_coverage(records: list[dict]) -> Rate:
+def contract_read_coverage_rate(records: list[dict]) -> Rate:
     k = sum(1 for r in records if r["error"] is None and "get_contract" in (r["coverage_tool_calls"] or []))
     return _rate(k, len(records))
 
 
-def contract_read_rate_risk(records: list[dict]) -> Rate:
+def contract_read_risk_rate(records: list[dict]) -> Rate:
     """Informational only -- most cases have no reason for the risk agent to
     read the contract at all. See contract_read_when_needed for the metric
     that actually means something."""
@@ -147,7 +147,7 @@ CONTRACT_BASED_FLAG_CASE_IDS = {"golden_13", "golden_33", "golden_54"}
 
 def contract_read_when_needed(records: list[dict]) -> Rate:
     """Over cases whose expected flag is actually contract-based: did the risk
-    agent call get_contract at all. The real version of contract_read_rate_risk."""
+    agent call get_contract at all. The real version of contract_read_risk_rate."""
     eligible = [r for r in records if r["case_id"] in CONTRACT_BASED_FLAG_CASE_IDS]
     k = sum(
         1 for r in eligible
@@ -246,6 +246,43 @@ def per_case_agreement_full(records: list[dict]) -> Rate:
     return _agreement(records, key)
 
 
+def _percentile(sorted_values: list[float], p: float) -> float:
+    index = int(p * (len(sorted_values) - 1))
+    return sorted_values[index]
+
+
+def latency_stats(records: list[dict]) -> dict:
+    """Mean and p95 latency per claim, in seconds. Only over records that ran
+    to completion (error or not -- latency is measured either way, up to the
+    point of failure); n is how many contributed."""
+    values = sorted(r["latency_seconds"] for r in records if r["latency_seconds"] is not None)
+    if not values:
+        return {"mean": None, "p95": None, "n": 0}
+    return {"mean": sum(values) / len(values), "p95": _percentile(values, 0.95), "n": len(values)}
+
+
+def token_cost_stats(records: list[dict]) -> dict:
+    """Mean input/output tokens and mean cost per claim (successful claims
+    only -- a failed claim's token counts are null, not zero, and averaging
+    nulls-as-zero would understate real cost per successful claim)."""
+    eligible = [r for r in records if r["input_tokens"] is not None]
+    n = len(eligible)
+    if not n:
+        return {"mean_input_tokens": None, "mean_output_tokens": None, "mean_cost_usd": None, "n": 0}
+    mean_input = sum(r["input_tokens"] for r in eligible) / n
+    mean_output = sum(r["output_tokens"] for r in eligible) / n
+    mean_cost = (
+        mean_input * config.GEMINI_PRICE_INPUT_PER_1M_USD
+        + mean_output * config.GEMINI_PRICE_OUTPUT_PER_1M_USD
+    ) / 1_000_000
+    return {
+        "mean_input_tokens": mean_input,
+        "mean_output_tokens": mean_output,
+        "mean_cost_usd": mean_cost,
+        "n": n,
+    }
+
+
 def compute_all(records: list[dict]) -> dict:
     return {
         "decision_match": decision_match(records),
@@ -255,9 +292,9 @@ def compute_all(records: list[dict]) -> dict:
         "limitation_match": limitation_match(records),
         "flags": flag_metrics(records),
         "evidence_exists_rate": evidence_exists_rate(records),
-        "contract_read_rate_coverage": contract_read_rate_coverage(records),
+        "contract_read_coverage_rate": contract_read_coverage_rate(records),
         "contract_read_when_needed": contract_read_when_needed(records),
-        "contract_read_rate_risk": contract_read_rate_risk(records),
+        "contract_read_risk_rate": contract_read_risk_rate(records),
         "bucket_match_rate": bucket_match_rate(records),
         "retrieval_hit_rate": retrieval_hit_rate(records),
         "cited_clause_retrieved_rate": cited_clause_retrieved_rate(records),
@@ -268,6 +305,8 @@ def compute_all(records: list[dict]) -> dict:
         "per_case_agreement_full": per_case_agreement_full(records),
         "decision_confusion_matrix": decision_confusion_matrix(records),
         "coverage_confusion_matrix": coverage_confusion_matrix(records),
+        "latency": latency_stats(records),
+        "tokens_cost": token_cost_stats(records),
     }
 
 
@@ -283,7 +322,7 @@ def print_score_table(records: list[dict]) -> None:
     for name in [
         "decision_match", "coverage_match", "cited_clause_rate",
         "missing_info_clause_null_rate", "evidence_exists_rate",
-        "contract_read_rate_coverage", "contract_read_when_needed", "contract_read_rate_risk",
+        "contract_read_coverage_rate", "contract_read_when_needed", "contract_read_risk_rate",
         "bucket_match_rate", "retrieval_hit_rate", "cited_clause_retrieved_rate",
         "error_rate", "wrongful_reject_rate", "wrongful_approve_rate",
     ]:
@@ -315,3 +354,11 @@ def print_score_table(records: list[dict]) -> None:
     print("coverage confusion matrix (expected, actual) -> count:")
     for (expected, actual), count in sorted(results["coverage_confusion_matrix"].items()):
         print(f"  {expected:<14} -> {actual:<14}: {count}")
+
+    lat = results["latency"]
+    print(f"\nlatency per claim (s): mean={lat['mean']} p95={lat['p95']} (n={lat['n']})")
+    tc = results["tokens_cost"]
+    print(
+        f"per claim: {tc['mean_input_tokens']} input + {tc['mean_output_tokens']} output tokens, "
+        f"${tc['mean_cost_usd']} (n={tc['n']})"
+    )

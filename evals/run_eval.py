@@ -5,6 +5,7 @@ score table. No judge model here -- see judge_calibration.py for that, later.
 
 import argparse
 import asyncio
+import hashlib
 import json
 import sys
 import time
@@ -114,13 +115,16 @@ async def main(eval_set: str, num_runs: int) -> None:
     cases = _load_cases(eval_set)
     git_commit = git_commit_hash()
     timestamp = int(time.time())
+    dataset_sha256 = hashlib.sha256(GOLDEN_PATH.read_bytes()).hexdigest()
     RESULTS_DIR.mkdir(exist_ok=True)
     out_path = RESULTS_DIR / f"{eval_set}-{timestamp}.jsonl"
 
     records = []
+    run_ids = []
     with out_path.open("w") as f:
         for run_index in range(1, num_runs + 1):
             run_id = f"{eval_set}-{timestamp}-run{run_index}"
+            run_ids.append(run_id)
             print(f"\n=== run {run_index}/{num_runs} (session: {run_id}) ===")
             for case in cases:
                 print(f"  {case['case_id']}...", end=" ", flush=True)
@@ -135,11 +139,15 @@ async def main(eval_set: str, num_runs: int) -> None:
 
     log_run(
         eval_set=eval_set,
+        timestamp=timestamp,
         num_runs=num_runs,
         coverage_prompt_version=COVERAGE_PROMPT_VERSION,
         risk_prompt_version=RISK_PROMPT_VERSION,
         model=config.GEMINI_MODEL_LIGHT,
         git_commit=git_commit,
+        dataset_sha256=dataset_sha256,
+        num_cases=len(cases),
+        langfuse_session_ids=run_ids,
         records=records,
         jsonl_path=out_path,
     )
