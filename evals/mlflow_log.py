@@ -9,9 +9,17 @@ raw records are recoverable later, not just its summary numbers.
 
 import mlflow
 
+import config
 from evals.metrics import compute_all
 
 EXPERIMENT_NAME = "claims-triage-eval"
+
+# The installed MLflow version put the plain filesystem backend ("./mlruns")
+# into maintenance mode and refuses to use it at all, raising instead ("Please
+# migrate to a database backend"). A local sqlite file is the recommended
+# replacement and still requires no server -- matches the already-gitignored
+# mlflow.db this project anticipated from Phase 0 but never actually wired up.
+mlflow.set_tracking_uri(f"sqlite:///{config.ROOT / 'mlflow.db'}")
 
 
 def _log_rate(name: str, rate: dict) -> None:

@@ -22,7 +22,10 @@ RECORDS = [
 
 
 def test_log_run_writes_params_metrics_and_artifact(tmp_path):
-    mlflow.set_tracking_uri(f"file://{tmp_path}")
+    # Overrides evals.mlflow_log's module-level sqlite URI (the real project's
+    # mlflow.db) with an isolated temp one -- this test must never touch the
+    # real tracking store.
+    mlflow.set_tracking_uri(f"sqlite:///{tmp_path / 'mlflow.db'}")
     jsonl_path = tmp_path / "smoke-123.jsonl"
     jsonl_path.write_text("{}\n")
 
