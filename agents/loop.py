@@ -33,6 +33,11 @@ class ToolCallRequest(BaseModel):
 @dataclass
 class ToolTurn:
     tool_calls: list[ToolCallRequest]  # empty -> model is done calling tools
+    # The model's own concluding text when it stops calling tools (e.g. "covered,
+    # 6.1"). Kept in history and handed to call_for_schema so that call asks the
+    # model to *restate* this conclusion in the schema, not re-decide from
+    # scratch -- two independent decisions is a bug, not a formatting step.
+    text: str | None = None
 
 
 class AgentClient(Protocol):
@@ -57,6 +62,10 @@ class AgentRunResult:
     output: BaseModel
     tool_calls: list[ToolCallRecord]
     steps: int
+    # Token usage is client-specific (loop.py never sets these); the caller that
+    # instantiates a real client (coverage.py/risk.py) fills them in afterward.
+    input_tokens: int = 0
+    output_tokens: int = 0
 
 
 async def run_agent(
@@ -80,6 +89,8 @@ async def run_agent(
 
         turn = await client.call_with_tools(agent_name, prompt_version, messages, tools)
         if not turn.tool_calls:
+            if turn.text:
+                messages.append({"role": "model", "text": turn.text})
             break
 
         # Record the model's own function-call turn before the results, so a real

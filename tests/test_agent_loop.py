@@ -99,3 +99,25 @@ async def test_final_output_failing_schema_raises():
 
     with pytest.raises(Exception):
         await run_agent(client, "coverage", "v1", "claim text", [], {}, Result)
+
+
+async def test_schema_call_receives_tool_turn_conclusion():
+    """The model's concluding tool-turn text must reach call_for_schema's history
+    -- that call restates this conclusion, it never re-decides from scratch."""
+    turns = [ToolTurn([], text="couverture: covered, clause 6.1")]
+    client = FakeClient(tool_turns=turns, final_output={"answer": "done"})
+
+    await run_agent(client, "coverage", "v1", "claim text", [], {}, Result)
+
+    schema_messages = next(messages for label, messages in client.calls if label == "schema")
+    assert {"role": "model", "text": "couverture: covered, clause 6.1"} in schema_messages
+
+
+async def test_tool_turn_without_text_appends_nothing_extra():
+    turns = [ToolTurn([])]
+    client = FakeClient(tool_turns=turns, final_output={"answer": "done"})
+
+    await run_agent(client, "coverage", "v1", "claim text", [], {}, Result)
+
+    schema_messages = next(messages for label, messages in client.calls if label == "schema")
+    assert schema_messages == [{"role": "user", "content": "claim text"}]

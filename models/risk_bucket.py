@@ -13,18 +13,29 @@ import config
 _MODEL = joblib.load(config.RISK_MODEL_PATH)
 
 
-def compute_risk_bucket(contract: dict) -> str:
-    """`contract` is a get_contract-shaped dict: needs config.FEATURES, exposure,
-    and claim_nb. "Actual claims" is the contract's recorded history only (#31) --
-    never the claim currently being filed."""
-    df = pd.DataFrame([contract])
-    for col in config.CATEGORICAL:
-        df[col] = df[col].astype("category")
-    rate = float(_MODEL.predict(df[config.FEATURES])[0])
-    expected_claims = rate * contract["exposure"]
-    p = poisson.sf(contract["claim_nb"] - 1, expected_claims)
+def bucket_from_rate(rate: float, exposure: float, claim_nb: int) -> str:
+    """Same Poisson-tail bucket as compute_risk_bucket, but from an
+    already-computed per-year rate (e.g. the risk_score MCP tool's own
+    result) -- doesn't load or call the model itself. Takes plain numbers,
+    never an agent run or tool-call object: by construction, nothing here can
+    depend on whether or how an LLM chose to call a tool."""
+    expected_claims = rate * exposure
+    p = poisson.sf(claim_nb - 1, expected_claims)
     if p >= config.RISK_P_LOW_MIN:
         return "low"
     if p >= config.RISK_P_MEDIUM_MIN:
         return "medium"
     return "high"
+
+
+def compute_risk_bucket(contract: dict) -> str:
+    """`contract` is a get_contract-shaped dict: needs config.FEATURES, exposure,
+    and claim_nb. "Actual claims" is the contract's recorded history only (#31) --
+    never the claim currently being filed. Used by the golden-set safety net,
+    which has no MCP session to call the risk_score tool through; the live
+    pipeline instead calls that tool directly and uses bucket_from_rate."""
+    df = pd.DataFrame([contract])
+    for col in config.CATEGORICAL:
+        df[col] = df[col].astype("category")
+    rate = float(_MODEL.predict(df[config.FEATURES])[0])
+    return bucket_from_rate(rate, contract["exposure"], contract["claim_nb"])

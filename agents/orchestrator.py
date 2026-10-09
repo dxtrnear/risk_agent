@@ -7,19 +7,24 @@ fixed table (DECISIONS #47).
 import asyncio
 import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from typing import Literal
 
+from langfuse import get_client, propagate_attributes
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 import config
+from agents.coverage import PROMPT_VERSION as COVERAGE_PROMPT_VERSION
 from agents.coverage import run_coverage_agent
 from agents.loop import AgentRunResult
+from agents.mcp_tools import make_tool_fns
+from agents.risk import PROMPT_VERSION as RISK_PROMPT_VERSION
 from agents.risk import run_risk_agent
 from agents.schemas import CoverageResult, RedFlag
-from models.risk_bucket import compute_risk_bucket
+from models.risk_bucket import bucket_from_rate
 
 SERVER_SCRIPT = config.ROOT / "mcp_server" / "server.py"
 
@@ -37,6 +42,7 @@ class TriageResult:
     dropped_flags: list[RedFlag]  # proposed by the risk agent, evidence check failed
     coverage_run: AgentRunResult
     risk_run: AgentRunResult
+    trace_id: str
 
 
 def _normalize(text: str) -> str:
@@ -101,14 +107,32 @@ def _decide(
     return "approve", coverage.clause_id
 
 
+def _git_commit_hash() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"],
+        cwd=config.ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
 class AgentFailure(Exception):
     """Raised when either agent errors out; the caller should treat this claim as
     needing human escalation rather than silently failing the whole pipeline."""
 
 
 async def triage(
-    contract_id: int, claim_text: str, claim_amount_eur: float | None
+    contract_id: int,
+    claim_text: str,
+    claim_amount_eur: float | None,
+    run_id: str = "single",
+    eval_set: str = "golden",
 ) -> TriageResult:
+    """`run_id` groups every claim from one evaluation run under one Langfuse
+    session (e.g. a smoke-set or baseline run); `eval_set` tags which case
+    population it's from (smoke/golden/production)."""
     params = StdioServerParameters(
         command=sys.executable, args=[str(SERVER_SCRIPT), str(contract_id)]
     )
@@ -121,41 +145,88 @@ async def triage(
     # AgentFailure` would never match it.
     agent_error: Exception | None = None
     coverage_run = risk_run = contract = None
+    langfuse_client = get_client()
 
-    async with stdio_client(params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
+    with langfuse_client.start_as_current_observation(
+        name="process_claim",
+        as_type="span",
+        input={"claim_text": claim_text, "claim_amount_eur": claim_amount_eur},
+        metadata={
+            "contract_id": contract_id,
+            "coverage_prompt_version": COVERAGE_PROMPT_VERSION,
+            "risk_prompt_version": RISK_PROMPT_VERSION,
+            "model": config.GEMINI_MODEL_LIGHT,
+            "git_commit": _git_commit_hash(),
+        },
+    ) as root:
+        # Every span created below is explicitly parented via trace_context
+        # (passed down through run_coverage_agent/run_risk_agent into
+        # agents/gemini_client.py and agents/mcp_tools.py) rather than relying on
+        # ambient OTel context -- ambient nesting does not reliably survive the
+        # stdio_client/ClientSession anyio task-group boundaries a few frames
+        # down (confirmed broken in practice: every call was its own trace).
+        # propagate_attributes still uses ambient (baggage) propagation for
+        # session_id/tags, which is a separate, more robust mechanism in OTel.
+        with propagate_attributes(
+            session_id=run_id, tags=[eval_set, "stage_a"], as_baggage=True
+        ):
+            async with stdio_client(params) as (read, write):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
 
-            try:
-                coverage_run = await run_coverage_agent(session, claim_text)
-                risk_run = await run_risk_agent(session, claim_text)
-            except Exception as exc:
-                agent_error = exc
-            else:
-                contract_raw = await session.call_tool("get_contract", {})
-                contract = json.loads(contract_raw.content[0].text)
+                    try:
+                        coverage_run = await run_coverage_agent(
+                            session, claim_text, root.trace_id, root.id
+                        )
+                        risk_run = await run_risk_agent(
+                            session, claim_text, root.trace_id, root.id
+                        )
+                    except Exception as exc:
+                        agent_error = exc
+                    else:
+                        # The pipeline calls get_contract and risk_score itself,
+                        # unconditionally, as plain code -- stat_bucket must
+                        # never depend on whether either agent chose to call a
+                        # tool (DECISIONS #111). Traced as pipeline-level tool
+                        # spans, parented to root directly (not to either agent).
+                        pipeline_tools = make_tool_fns(
+                            session, ["get_contract", "risk_score"], root.trace_id, root.id
+                        )
+                        contract = json.loads(await pipeline_tools["get_contract"]())
+                        rate = json.loads(await pipeline_tools["risk_score"]())[
+                            "expected_claims_per_year"
+                        ]
 
-    if agent_error is not None:
-        # Agents disagreeing or erroring is a separate, runtime-only escalation
-        # path, not part of the main decision table.
-        raise AgentFailure(f"agent run failed, this claim must escalate: {agent_error}") from agent_error
+        trace_id = root.trace_id
 
-    coverage = coverage_run.output
-    _check_clause_id(coverage.clause_id)
+        if agent_error is not None:
+            root.update(output={"error": str(agent_error)})
+            langfuse_client.flush()
+            # Agents disagreeing or erroring is a separate, runtime-only
+            # escalation path, not part of the main decision table.
+            raise AgentFailure(
+                f"agent run failed, this claim must escalate: {agent_error}"
+            ) from agent_error
 
-    stat_bucket = compute_risk_bucket(contract)
-    validated_flags, dropped_flags = _validate_flags(risk_run.output.flags, claim_text)
-    effective_amount_eur = _effective_amount(claim_amount_eur, coverage.limitation)
+        coverage = coverage_run.output
+        _check_clause_id(coverage.clause_id)
 
-    decision, decision_clause_id = _decide(
-        coverage,
-        claim_amount_eur,
-        effective_amount_eur,
-        contract["franchise"],
-        stat_bucket,
-        validated_flags,
-    )
-    _check_clause_id(decision_clause_id)
+        stat_bucket = bucket_from_rate(rate, contract["exposure"], contract["claim_nb"])
+        validated_flags, dropped_flags = _validate_flags(risk_run.output.flags, claim_text)
+        effective_amount_eur = _effective_amount(claim_amount_eur, coverage.limitation)
+
+        decision, decision_clause_id = _decide(
+            coverage,
+            claim_amount_eur,
+            effective_amount_eur,
+            contract["franchise"],
+            stat_bucket,
+            validated_flags,
+        )
+        _check_clause_id(decision_clause_id)
+        root.update(output={"decision": decision, "decision_clause_id": decision_clause_id})
+
+    langfuse_client.flush()
 
     return TriageResult(
         decision=decision,
@@ -167,6 +238,7 @@ async def triage(
         dropped_flags=dropped_flags,
         coverage_run=coverage_run,
         risk_run=risk_run,
+        trace_id=trace_id,
     )
 
 
@@ -181,6 +253,7 @@ if __name__ == "__main__":
 
     result = asyncio.run(triage(args.contract_id, args.claim_text, args.claim_amount_eur))
 
+    print(f"trace_id: {result.trace_id}")
     print(f"decision: {result.decision}")
     print(f"decision_clause_id: {result.decision_clause_id}")
     print(f"coverage: {result.coverage}")

@@ -3,8 +3,9 @@ and a nullable partial-coverage limitation. Tools: get_contract, search_clauses.
 Never sees the risk agent's flags or stat_bucket (strict isolation, DECISIONS #42).
 """
 
-from mcp import ClientSession
 from google.genai import types
+from langfuse import get_client
+from mcp import ClientSession
 
 from agents.gemini_client import GeminiAgentClient
 from agents.loop import AgentRunResult, run_agent
@@ -64,9 +65,20 @@ TOOLS = [
 ]
 
 
-async def run_coverage_agent(session: ClientSession, claim_text: str) -> AgentRunResult:
-    client = GeminiAgentClient(SYSTEM_PROMPT)
-    tool_fns = make_tool_fns(session, TOOL_NAMES)
-    return await run_agent(
-        client, "coverage", PROMPT_VERSION, claim_text, TOOLS, tool_fns, CoverageResult
-    )
+async def run_coverage_agent(
+    session: ClientSession, claim_text: str, parent_trace_id: str, parent_span_id: str
+) -> AgentRunResult:
+    langfuse_client = get_client()
+    with langfuse_client.start_as_current_observation(
+        name="coverage",
+        as_type="agent",
+        trace_context={"trace_id": parent_trace_id, "parent_span_id": parent_span_id},
+    ) as agent_span:
+        client = GeminiAgentClient(SYSTEM_PROMPT, agent_span.trace_id, agent_span.id)
+        tool_fns = make_tool_fns(session, TOOL_NAMES, agent_span.trace_id, agent_span.id)
+        run = await run_agent(
+            client, "coverage", PROMPT_VERSION, claim_text, TOOLS, tool_fns, CoverageResult
+        )
+        run.input_tokens, run.output_tokens = client.input_tokens, client.output_tokens
+        agent_span.update(output=run.output.model_dump())
+    return run

@@ -20,9 +20,14 @@ class FakeSession:
         return SimpleNamespace(is_error=is_error, content=[SimpleNamespace(text=text)])
 
 
+# Must be valid hex: Langfuse's trace_context parses these with int(x, 16)
+# (128-bit trace_id, 64-bit span_id, matching OTel ID widths).
+PARENT = ("a" * 32, "b" * 16)
+
+
 async def test_successful_call_returns_text():
     session = FakeSession(responses={"get_contract": (False, '{"formule": "tous_risques"}')})
-    tool_fns = make_tool_fns(session, ["get_contract"])
+    tool_fns = make_tool_fns(session, ["get_contract"], *PARENT)
 
     result = await tool_fns["get_contract"]()
 
@@ -32,7 +37,7 @@ async def test_successful_call_returns_text():
 
 async def test_arguments_forwarded():
     session = FakeSession(responses={"search_clauses": (False, "{}")})
-    tool_fns = make_tool_fns(session, ["search_clauses"])
+    tool_fns = make_tool_fns(session, ["search_clauses"], *PARENT)
 
     await tool_fns["search_clauses"](query="vol", k=3)
 
@@ -41,7 +46,7 @@ async def test_arguments_forwarded():
 
 async def test_error_result_raises_tool_error():
     session = FakeSession(responses={"search_clauses": (True, "query must not be empty")})
-    tool_fns = make_tool_fns(session, ["search_clauses"])
+    tool_fns = make_tool_fns(session, ["search_clauses"], *PARENT)
 
     with pytest.raises(ToolError, match="query must not be empty"):
         await tool_fns["search_clauses"](query="")
@@ -49,6 +54,6 @@ async def test_error_result_raises_tool_error():
 
 async def test_only_named_tools_are_exposed():
     session = FakeSession(responses={})
-    tool_fns = make_tool_fns(session, ["get_contract", "search_clauses"])
+    tool_fns = make_tool_fns(session, ["get_contract", "search_clauses"], *PARENT)
 
     assert set(tool_fns) == {"get_contract", "search_clauses"}

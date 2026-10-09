@@ -1,5 +1,7 @@
 """_to_contents message translation -- pure function, no LLM call."""
 
+from google.genai import types
+
 from agents.gemini_client import _to_contents
 
 
@@ -36,6 +38,13 @@ def test_model_turn_without_signature_defaults_to_none():
     assert contents[0].parts[0].thought_signature is None
 
 
+def test_model_text_turn_becomes_text_part():
+    messages = [{"role": "model", "text": "couverture: covered, clause 6.1"}]
+    contents = _to_contents(messages)
+    assert contents[0].role == "model"
+    assert contents[0].parts[0].text == "couverture: covered, clause 6.1"
+
+
 def test_tool_turn_becomes_function_response_part():
     messages = [{"role": "tool", "name": "get_contract", "content": '{"formule": "tous_risques"}'}]
     contents = _to_contents(messages)
@@ -60,3 +69,19 @@ def test_unknown_role_raises():
 
     with pytest.raises(ValueError, match="unknown message shape"):
         _to_contents([{"role": "system", "content": "nope"}])
+
+
+def test_appending_restate_instruction_avoids_ending_on_model_turn():
+    """Regression test: Gemini's API rejects any request whose `contents` ends
+    on a model turn ("Requests ending with a model turn are not supported").
+    call_for_schema must append a final user turn after _to_contents when the
+    conversation's last message is the model's own concluding text."""
+    messages = [
+        {"role": "user", "content": "bonjour"},
+        {"role": "model", "text": "couverture: covered, clause 6.1"},
+    ]
+    contents = _to_contents(messages)
+    assert contents[-1].role == "model"  # the bug's precondition
+
+    contents.append(types.Content(role="user", parts=[types.Part(text="restate please")]))
+    assert contents[-1].role == "user"

@@ -64,7 +64,7 @@ PARTIAL_COVERAGE_FRACTIONS = {
 # Per-agent tool allow-lists (not stored on individual cases -- a case's expected
 # tools are a function of which agent runs, not something that varies per claim).
 COVERAGE_AGENT_TOOLS = ["get_contract", "search_clauses"]
-RISK_AGENT_TOOLS = ["get_contract", "risk_score"]
+RISK_AGENT_TOOLS = ["get_contract"]
 
 AGENT_STEP_LIMIT = 6  # max LLM turns per agent loop before it fails loudly
 AGENT_TIMEOUT_SECONDS = 30  # wall-clock budget for one agent's full loop
@@ -72,6 +72,13 @@ AGENT_TIMEOUT_SECONDS = 30  # wall-clock budget for one agent's full loop
 # The clause cited for a franchise-reject is the franchise clause itself, not the
 # coverage clause (e.g. golden_05: agent_clause_ids=["6.5"], decision_clause_id="8.1").
 FRANCHISE_CLAUSE_ID = "8.1"
+
+# gemini-3.5-flash-lite pricing, USD per 1M tokens. Sourced from third-party
+# pricing aggregators (anotherwrapper.com, pricepertoken.com) referencing
+# ai.google.dev/gemini-api/docs/pricing as of ~2026-08 -- NOT fetched directly
+# from Google's own page, so verify there before trusting this for real budgeting.
+GEMINI_PRICE_INPUT_PER_1M_USD = 0.30
+GEMINI_PRICE_OUTPUT_PER_1M_USD = 2.50
 
 # formule -> list of garantie clause_ids included in that tier. Clause 12's table
 # lost its cell structure during PDF extraction (header row and data row text got
