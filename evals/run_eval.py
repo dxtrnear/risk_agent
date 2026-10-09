@@ -17,6 +17,7 @@ from agents.coverage import PROMPT_VERSION as COVERAGE_PROMPT_VERSION
 from agents.orchestrator import AgentFailure, git_commit_hash, triage
 from agents.risk import PROMPT_VERSION as RISK_PROMPT_VERSION
 from evals.metrics import print_score_table
+from evals.mlflow_log import log_run
 
 GOLDEN_PATH = config.ROOT / "evals" / "golden" / "golden.json"
 SMOKE_SET_PATH = config.ROOT / "evals" / "smoke_set.json"
@@ -131,6 +132,18 @@ async def main(eval_set: str, num_runs: int) -> None:
     print(f"\nwrote {len(records)} records to {out_path}")
     print()
     print_score_table(records)
+
+    log_run(
+        eval_set=eval_set,
+        num_runs=num_runs,
+        coverage_prompt_version=COVERAGE_PROMPT_VERSION,
+        risk_prompt_version=RISK_PROMPT_VERSION,
+        model=config.GEMINI_MODEL_LIGHT,
+        git_commit=git_commit,
+        records=records,
+        jsonl_path=out_path,
+    )
+    print("\nlogged to MLflow experiment 'claims-triage-eval' -- run `mlflow ui` to view it")
 
 
 if __name__ == "__main__":

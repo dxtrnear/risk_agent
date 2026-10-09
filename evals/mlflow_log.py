@@ -1,0 +1,64 @@
+"""MLflow experiment tracking for eval runs. One MLflow run per run_eval.py
+invocation. Params are the run's configuration (prompt versions, model, git
+commit, eval set, repetition count); metrics are every score's rate/k/n (and
+TP/FP/FN for limitation and flags, never precision/recall directly -- those
+are None for a flag type with zero occurrences, and MLflow metrics must be
+floats); the JSONL file itself is logged as an artifact, so any run's exact
+raw records are recoverable later, not just its summary numbers.
+"""
+
+import mlflow
+
+from evals.metrics import compute_all
+
+EXPERIMENT_NAME = "claims-triage-eval"
+
+
+def _log_rate(name: str, rate: dict) -> None:
+    mlflow.log_metric(f"{name}_rate", rate["rate"])
+    mlflow.log_metric(f"{name}_k", rate["k"])
+    mlflow.log_metric(f"{name}_n", rate["n"])
+
+
+def log_run(
+    *,
+    eval_set: str,
+    num_runs: int,
+    coverage_prompt_version: str,
+    risk_prompt_version: str,
+    model: str,
+    git_commit: str,
+    records: list[dict],
+    jsonl_path,
+) -> None:
+    mlflow.set_experiment(EXPERIMENT_NAME)
+    with mlflow.start_run():
+        mlflow.log_param("eval_set", eval_set)
+        mlflow.log_param("num_runs", num_runs)
+        mlflow.log_param("coverage_prompt_version", coverage_prompt_version)
+        mlflow.log_param("risk_prompt_version", risk_prompt_version)
+        mlflow.log_param("model", model)
+        mlflow.log_param("git_commit", git_commit)
+
+        results = compute_all(records)
+        for name, value in results.items():
+            if name in ("decision_confusion_matrix", "coverage_confusion_matrix"):
+                continue  # not scalar; rebuild from the artifact JSONL if needed
+            if name == "limitation_match":
+                mlflow.log_metric("limitation_tp", value["tp"])
+                mlflow.log_metric("limitation_fp", value["fp"])
+                mlflow.log_metric("limitation_fn", value["fn"])
+            elif name == "flags":
+                overall = value["overall"]
+                mlflow.log_metric("flags_overall_tp", overall["tp"])
+                mlflow.log_metric("flags_overall_fp", overall["fp"])
+                mlflow.log_metric("flags_overall_fn", overall["fn"])
+                for flag_type, counts in value["per_type"].items():
+                    mlflow.log_metric(f"flags_{flag_type}_tp", counts["tp"])
+                    mlflow.log_metric(f"flags_{flag_type}_fp", counts["fp"])
+                    mlflow.log_metric(f"flags_{flag_type}_fn", counts["fn"])
+                _log_rate("hard_negative_false_positive", value["hard_negative_false_positive"])
+            else:
+                _log_rate(name, value)
+
+        mlflow.log_artifact(str(jsonl_path))
