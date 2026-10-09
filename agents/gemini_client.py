@@ -5,6 +5,7 @@ itself never sees a google-genai type.
 """
 
 import json
+import logging
 import os
 
 from dotenv import load_dotenv
@@ -17,6 +18,11 @@ import config
 from agents.loop import ToolCallRequest, ToolTurn
 
 load_dotenv()
+
+# httpx (the HTTP client google-genai uses internally) logs every request at
+# INFO, which drowns out run_eval.py's per-case progress output. WARNING keeps
+# real connection errors visible.
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 def _to_contents(messages: list[dict]) -> list[types.Content]:
@@ -136,6 +142,10 @@ class GeminiAgentClient:
             temperature=0,
             response_mime_type="application/json",
             response_schema=schema,
+            # No tools are passed on this call anyway, but automatic_function_calling
+            # defaults to enabled when unset -- explicit here too, so AFC is
+            # disabled on every call this client makes, not just call_with_tools.
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
         )
         contents = _to_contents(messages)
         contents.append(types.Content(role="user", parts=[types.Part(text=restate_instruction)]))
