@@ -40,18 +40,18 @@
   {
     "case_id": "golden_03",
     "contract_id": 2122523,
-    "claim_text": "Bonjour, j'ai eu un accident la semaine dernière : j'ai perdu le contrôle de mon véhicule sur une route mouillée et j'ai heurté la glissière de sécurité. Je suis seul impliqué, personne d'autre n'est concerné. Merci de verser l'indemnisation directement au garage, je n'ai pas les moyens d'avancer les 1200 euros, et j'aimerais éviter le passage d'un expert, je connais déjà bien le dossier. Comment se passe la prise en charge ?",
+    "claim_text": "Bonjour, j'ai eu un accident la semaine dernière : j'ai perdu le contrôle de mon véhicule sur une route mouillée et j'ai heurté la glissière de sécurité. Je suis seul impliqué, personne d'autre n'est concerné. Merci de verser l'indemnisation en espèces, je n'ai pas les moyens d'avancer les 1200 euros, et j'aimerais éviter le passage d'un expert, je connais déjà bien le dossier. Comment se passe la prise en charge ?",
     "claim_amount_eur": 1200,
     "effective_amount_eur": 1200,
     "scenario": "not_covered + flag present, reject holds (formule-gap): precedence over flags",
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "rationale": "formule=tiers ne couvre pas les dommages au vehicule; not_covered precede le declencheur de flag dans la table de decision -> reject malgre le payment_pressure valide (paiement a un tiers + refus d'expertise)",
+    "rationale": "formule=tiers ne couvre pas les dommages au vehicule; not_covered precede le declencheur de flag dans la table de decision -> reject malgre le payment_pressure valide (especes + refus d'expertise; payer directement le garage reparateur n'aurait pas ete un flag, cf. golden_58)",
     "expected_flags": [
       {
         "flag": "payment_pressure",
-        "evidence": "Merci de verser l'indemnisation directement au garage, je n'ai pas les moyens d'avancer les 1200 euros, et j'aimerais éviter le passage d'un expert, je connais déjà bien le dossier."
+        "evidence": "Merci de verser l'indemnisation en espèces, je n'ai pas les moyens d'avancer les 1200 euros, et j'aimerais éviter le passage d'un expert, je connais déjà bien le dossier."
       }
     ],
     "agent_clause_ids": [
@@ -158,18 +158,18 @@
   {
     "case_id": "golden_09",
     "contract_id": 4001936,
-    "claim_text": "Bonjour, un gravillon a fissuré mon pare-brise hier alors que je roulais sur l'autoroute. En fait, maintenant que j'y pense, la voiture était peut-être garée au moment où c'est arrivé, je ne suis plus très sûr du moment exact, mais le pare-brise est bien fissuré. Le garage me propose de le remplacer pour 1200 euros, le verre feuilleté avec capteurs étant plus cher sur mon modèle. Merci de me dire si c'est pris en charge.",
+    "claim_text": "Bonjour, un gravillon a fissuré mon pare-brise hier alors que je roulais sur l'autoroute. En fait, la voiture était garée tout l'après-midi devant chez moi, elle n'a pas bougé de la journée. Le garage me propose de le remplacer pour 1200 euros, le verre feuilleté avec capteurs étant plus cher sur mon modèle. Merci de me dire si c'est pris en charge.",
     "claim_amount_eur": 1200,
     "effective_amount_eur": 1200,
     "scenario": "double declencheur (risque + flag): bris de glace, risque high, montant sous le seuil",
     "expected_coverage": "covered",
     "expected_risk_bucket": "high",
     "expected_decision": "escalate",
-    "rationale": "756 < 1200 <= 4000 mais risque high -> escalate deja via le risque; inconsistent_story valide (contradiction roulant/gare, un fait materiel) -> double declencheur; la contradiction reste sans consequence sur la garantie car 6.1 couvre quelle que soit la cause (cf. golden_47)",
+    "rationale": "756 < 1200 <= 4000 mais risque high -> escalate deja via le risque; inconsistent_story valide (deux affirmations fermes et incompatibles: roulait sur l'autoroute / n'a pas bouge de la journee) -> double declencheur; la contradiction reste sans consequence sur la garantie car 6.1 couvre quelle que soit la cause (cf. golden_47)",
     "expected_flags": [
       {
         "flag": "inconsistent_story",
-        "evidence": "En fait, maintenant que j'y pense, la voiture était peut-être garée au moment où c'est arrivé, je ne suis plus très sûr du moment exact, mais le pare-brise est bien fissuré."
+        "evidence": "En fait, la voiture était garée tout l'après-midi devant chez moi, elle n'a pas bougé de la journée."
       }
     ],
     "agent_clause_ids": [
@@ -593,18 +593,18 @@
   {
     "case_id": "golden_31",
     "contract_id": 3169849,
-    "claim_text": "Bonjour, ma voiture était garée dans la rue lors de l'attentat qui a eu lieu la semaine dernière dans le centre-ville, elle a été endommagée par l'explosion. Le garage évalue les réparations à 900 euros. Merci de verser directement les 900 euros au garage, et j'aimerais éviter le passage d'un expert, je n'ai pas le temps pour ça. Est-ce pris en charge ?",
+    "claim_text": "Bonjour, ma voiture était garée dans la rue lors de l'attentat qui a eu lieu la semaine dernière dans le centre-ville, elle a été endommagée par l'explosion. Le garage évalue les réparations à 900 euros. Merci de verser les 900 euros sur le compte de mon frère, ce sera plus simple pour moi, et j'aimerais éviter le passage d'un expert, je n'ai pas le temps pour ça. Est-ce pris en charge ?",
     "claim_amount_eur": 900,
     "effective_amount_eur": 900,
     "scenario": "flag-only escalate (payment_pressure): attentat/acte de terrorisme",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "rationale": "366 < 900 <= 4000, low risk -> approuverait sans le flag; payment_pressure valide (paiement a un tiers + refus d'expertise) -> escalate",
+    "rationale": "366 < 900 <= 4000, low risk -> approuverait sans le flag; payment_pressure valide (paiement a un tiers sans lien avec la reparation + refus d'expertise) -> escalate",
     "expected_flags": [
       {
         "flag": "payment_pressure",
-        "evidence": "Merci de verser directement les 900 euros au garage, et j'aimerais éviter le passage d'un expert, je n'ai pas le temps pour ça."
+        "evidence": "Merci de verser les 900 euros sur le compte de mon frère, ce sera plus simple pour moi, et j'aimerais éviter le passage d'un expert, je n'ai pas le temps pour ça."
       }
     ],
     "agent_clause_ids": [
@@ -636,18 +636,18 @@
   {
     "case_id": "golden_33",
     "contract_id": 2188154,
-    "claim_text": "Bonjour, j'ai heurté le trottoir en me garant et le pare-chocs avant est fissuré. Ma voiture est quasiment neuve, je l'ai achetée il y a à peine un an. Le garage me propose de le remplacer pour 550 euros. C'est pris en charge ?",
+    "claim_text": "Bonjour, j'ai heurté le trottoir en me garant et le pare-chocs avant est fissuré. Je l'ai achetée neuve il y a un an. Le garage me propose de le remplacer pour 550 euros. C'est pris en charge ?",
     "claim_amount_eur": 550,
     "effective_amount_eur": 550,
     "scenario": "flag-only escalate (vehicle_mismatch): dommages tous accidents, minime (vrai veh_age=8)",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "rationale": "305 < 550 <= 4000, low risk -> approuverait sans le flag; vehicle_mismatch valide (contrat: vehicule de 8 ans, texte dit quasiment neuve/achetee il y a un an) -> escalate",
+    "rationale": "305 < 550 <= 4000, low risk -> approuverait sans le flag; vehicle_mismatch valide (contrat: vehicule de 8 ans, texte dit achetee neuve il y a un an, donc ~1 an) -> escalate",
     "expected_flags": [
       {
         "flag": "vehicle_mismatch",
-        "evidence": "Ma voiture est quasiment neuve, je l'ai achetée il y a à peine un an."
+        "evidence": "Je l'ai achetée neuve il y a un an."
       }
     ],
     "agent_clause_ids": [
@@ -854,7 +854,7 @@
   {
     "case_id": "golden_44",
     "contract_id": 4082391,
-    "claim_text": "Bonjour, ma voiture a été volée cette nuit sur le parking de mon immeuble. Je garde toujours une clé de secours dans la boîte à gants. La police l'a retrouvée ce matin dans une rue voisine, la portière forcée et la serrure arrachée. Le concessionnaire l'estime à 3000 euros. Que dois-je faire ?",
+    "claim_text": "Bonjour, ma voiture a été volée cette nuit sur le parking de mon immeuble. Je garde toujours une clé de secours dans la boîte à gants. La police l'a retrouvée ce matin dans une rue voisine, la portière forcée et la serrure arrachée. Le garage évalue les réparations (serrure, portière) à 3000 euros. Que dois-je faire ?",
     "claim_amount_eur": 3000,
     "effective_amount_eur": 2100,
     "scenario": "vol, cle de secours dans la boite a gants (limitation 70%) ET effraction constatee sur le vehicule retrouve",
@@ -873,20 +873,15 @@
   {
     "case_id": "golden_45",
     "contract_id": 25250,
-    "claim_text": "Bonjour, je travaillais temporairement à l'étranger et ma voiture, que j'avais emmenée avec moi, a été détruite par un bombardement lors du conflit armé qui a éclaté dans le pays. Je devais encore rester deux mois sur place pour ce contrat professionnel. En fait, je crois que mon contrat se terminait la semaine suivante, je ne sais plus trop combien de temps il me restait sur place. Le concessionnaire l'estime à 3000 euros. Est-ce pris en charge ?",
+    "claim_text": "Bonjour, je travaillais temporairement à l'étranger et ma voiture, que j'avais emmenée avec moi, a été détruite par un bombardement lors du conflit armé qui a éclaté dans le pays. Le concessionnaire l'estime à 3000 euros. Est-ce pris en charge ?",
     "claim_amount_eur": 3000,
     "effective_amount_eur": 3000,
-    "scenario": "guerre etrangere — reject exclusion explicite (clause 7); flag present mais sans lien avec l'exclusion",
+    "scenario": "guerre etrangere — reject exclusion explicite (clause 7)",
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "rationale": "dommage cause par la guerre etrangere: exclusion generale clause 7 -> reject; inconsistent_story valide sur la duree du contrat (fait materiel contradictoire) mais sans lien avec le fait de guerre -> not_covered precede, reject malgre le flag",
-    "expected_flags": [
-      {
-        "flag": "inconsistent_story",
-        "evidence": "En fait, je crois que mon contrat se terminait la semaine suivante, je ne sais plus trop combien de temps il me restait sur place."
-      }
-    ],
+    "rationale": "dommage cause par la guerre etrangere: exclusion generale clause 7 -> reject",
+    "expected_flags": [],
     "agent_clause_ids": [
       "7"
     ],
@@ -971,15 +966,20 @@
   {
     "case_id": "golden_50",
     "contract_id": 3006793,
-    "claim_text": "Bonjour, j'ai crevé un pneu en roulant sur un nid de poule, le pneu est inutilisable. Aucun autre dégât sur la voiture. Le garage me propose un pneu neuf pour 180 euros. C'est remboursé par les dommages tous accidents ?",
+    "claim_text": "Bonjour, j'ai crevé un pneu en roulant sur un nid de poule, le pneu est inutilisable. En fait, la voiture n'a pas bougé du garage depuis trois semaines. Aucun autre dégât sur la voiture. Le garage me propose un pneu neuf pour 180 euros. C'est remboursé par les dommages tous accidents ?",
     "claim_amount_eur": 180,
     "effective_amount_eur": 180,
-    "scenario": "dommage pneumatique seul, aucune autre piece affectee — reject exclusion explicite (clause 6.5)",
+    "scenario": "dommage pneumatique seul, aucune autre piece affectee — reject exclusion explicite (clause 6.5); flag present mais sans effet (exclusion tient de toute facon)",
     "expected_coverage": "not_covered",
     "expected_risk_bucket": "low",
     "expected_decision": "reject",
-    "rationale": "6.5 exclut les dommages aux pneumatiques sauf consequence d'un accident affectant d'autres parties; ici seul le pneu est touche -> exclusion",
-    "expected_flags": [],
+    "rationale": "6.5 exclut les dommages aux pneumatiques sauf consequence d'un accident affectant d'autres parties; ici seul le pneu est touche -> exclusion tient, avec ou sans la contradiction; inconsistent_story valide (deux affirmations fermes et incompatibles: creve en roulant / n'a pas bouge depuis trois semaines) mais not_covered precede -> reject malgre le flag",
+    "expected_flags": [
+      {
+        "flag": "inconsistent_story",
+        "evidence": "En fait, la voiture n'a pas bougé du garage depuis trois semaines."
+      }
+    ],
     "agent_clause_ids": [
       "6.5"
     ],
@@ -1049,18 +1049,18 @@
   {
     "case_id": "golden_54",
     "contract_id": 43271,
-    "claim_text": "Bonjour, je conduis cette voiture avec précaution depuis que j'ai pris ma retraite il y a dix ans, à 55 ans je fais toujours très attention sur la route. J'ai eu un accrochage hier en reculant sur un parking, l'arrière de la voiture est enfoncé. Le garage évalue les réparations à 1200 euros.",
+    "claim_text": "Bonjour, j'ai 67 ans et je suis à la retraite depuis cinq ans, je conduis cette voiture avec beaucoup de précaution. J'ai eu un accrochage hier en reculant sur un parking, l'arrière de la voiture est enfoncé. Le garage évalue les réparations à 1200 euros.",
     "claim_amount_eur": 1200,
     "effective_amount_eur": 1200,
     "scenario": "flag-only escalate (driver_mismatch, contrat): age declare contredit par driv_age",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "rationale": "787 < 1200 <= 4000, low risk -> approuverait sans le flag; driver_mismatch valide (texte implique un conducteur d'environ 55-65 ans retraite depuis dix ans, contrat: driv_age=28) -> escalate",
+    "rationale": "787 < 1200 <= 4000, low risk -> approuverait sans le flag; driver_mismatch valide (texte declare 67 ans, contrat: driv_age=28) -> escalate",
     "expected_flags": [
       {
         "flag": "driver_mismatch",
-        "evidence": "je conduis cette voiture avec précaution depuis que j'ai pris ma retraite il y a dix ans, à 55 ans je fais toujours très attention sur la route"
+        "evidence": "j'ai 67 ans et je suis à la retraite depuis cinq ans, je conduis cette voiture avec beaucoup de précaution"
       }
     ],
     "agent_clause_ids": [
@@ -1130,6 +1130,25 @@
     "expected_risk_bucket": "low",
     "expected_decision": "approve",
     "rationale": "615 < 1100 <= 4000, low risk -> approve",
+    "expected_flags": [],
+    "agent_clause_ids": [
+      "6.5"
+    ],
+    "decision_clause_id": "6.5",
+    "expected_limitation": null,
+    "reject_reason": null
+  },
+  {
+    "case_id": "golden_58",
+    "contract_id": 4146883,
+    "claim_text": "Bonjour, j'ai embouti l'arrière d'un autre véhicule à un feu rouge hier, l'avant de ma voiture est abîmé. Merci de verser l'indemnisation directement au garage qui s'occupe de la réparation, ce sera plus simple pour tout le monde. Le garage évalue les dégâts à 1400 euros.",
+    "claim_amount_eur": 1400,
+    "effective_amount_eur": 1400,
+    "scenario": "hard negative: payment_pressure (paiement direct au garage reparateur)",
+    "expected_coverage": "covered",
+    "expected_risk_bucket": "low",
+    "expected_decision": "approve",
+    "rationale": "631 < 1400 <= 4000, low risk -> approve; payer directement le garage qui effectue la reparation est une pratique standard (pas un tiers sans lien, pas de refus d'expertise) -> aucun flag valide",
     "expected_flags": [],
     "agent_clause_ids": [
       "6.5"
