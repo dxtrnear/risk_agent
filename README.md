@@ -32,3 +32,11 @@ as the project progresses (not a design log — see `DECISIONS.md` for that).
 - A trace-completeness check that retries on trace *count* can stop before a
   correct claim's slower-arriving spans finish exporting, reporting a false
   failure on a run that actually succeeded — must retry on completeness.
+- Golden baseline v1 (58 cases × 3 runs, 167/174 decision match): `golden_25`'s
+  one wrong run exposed two compounding defects at once, not one. `search_clauses`
+  didn't retrieve the exclusion clause that run, so the coverage agent judged an
+  unlicensed 16-year-old's claim "covered" with no exclusion in hand to cite — and
+  independently, the risk agent raised an undeclared `driver_mismatch` false
+  positive on the same claim in all three runs, which only became visible as an
+  escalation in the one run where the retrieval miss had already broken coverage.
+  A retrieval gap and a flag false positive, not a single clean failure.
