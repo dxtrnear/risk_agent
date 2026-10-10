@@ -437,18 +437,18 @@
   {
     "case_id": "golden_23",
     "contract_id": 3152566,
-    "claim_text": "Bonjour, j'ai retrouvé ma voiture avec une petite rayure sur la portière avant, à peine visible, faite probablement par une clé sur le parking de mon travail. Franchement ce n'est presque rien, mais le garage me demande 1800 euros pour repeindre toute la portière et refaire la teinte. C'est pris en charge ?",
-    "claim_amount_eur": 1800,
-    "effective_amount_eur": 1800,
-    "scenario": "flag-only escalate (amount_vs_damage): vandalisme (dommages tous accidents)",
+    "claim_text": "Bonjour, j'ai trouvé une toute petite rayure sur ma portière avant, faite probablement par une clé sur le parking de mon travail, on la voit à peine, il faut vraiment chercher pour la remarquer. Le garage me demande pourtant 2500 euros pour ça, sans même m'expliquer pourquoi. Est-ce pris en charge ?",
+    "claim_amount_eur": 2500,
+    "effective_amount_eur": 2500,
+    "scenario": "flag-only escalate (amount_vs_damage): vandalisme (dommages tous accidents), disproportion sans ambiguite",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "rationale": "338 < 1800 <= 4000, low risk -> approuverait sans le flag; amount_vs_damage valide (degat mineur decrit de facon constante, montant disproportionne) -> escalate",
+    "rationale": "338 < 2500 <= 4000, low risk -> approuverait sans le flag; amount_vs_damage valide (degat mineur decrit de facon constante -- a peine visible -- et montant eleve non justifie) -> escalate",
     "expected_flags": [
       {
         "flag": "amount_vs_damage",
-        "evidence": "Franchement ce n'est presque rien, mais le garage me demande 1800 euros pour repeindre toute la portière et refaire la teinte."
+        "evidence": "on la voit à peine, il faut vraiment chercher pour la remarquer. Le garage me demande pourtant 2500 euros pour ça, sans même m'expliquer pourquoi."
       }
     ],
     "agent_clause_ids": [
@@ -792,18 +792,18 @@
   {
     "case_id": "golden_41",
     "contract_id": 1055283,
-    "claim_text": "Bonjour, ma maison et ma rue ont été inondées par la crue de la semaine dernière, ma voiture garée devant chez moi a été endommagée par l'eau. Un arrêté interministériel a été publié au Journal Officiel reconnaissant l'état de catastrophe naturelle pour ma commune. L'eau est juste montée un peu au niveau des pneus, rien de spectaculaire à voir, mais le garage me demande 1900 euros pour tout refaire.",
-    "claim_amount_eur": 1900,
-    "effective_amount_eur": 1900,
-    "scenario": "flag-only escalate (amount_vs_damage): catastrophe naturelle, decret publie",
+    "claim_text": "Bonjour, ma maison et ma rue ont été inondées par la crue de la semaine dernière, ma voiture garée devant chez moi a été endommagée par l'eau. Un arrêté interministériel a été publié au Journal Officiel reconnaissant l'état de catastrophe naturelle pour ma commune. Les tapis de sol sont trempés, c'est à peu près le seul dégât, la voiture démarre et roule normalement, mais le garage me demande pourtant 3500 euros pour tout refaire, sans même me dire ce qui serait abîmé.",
+    "claim_amount_eur": 3500,
+    "effective_amount_eur": 3500,
+    "scenario": "flag-only escalate (amount_vs_damage): catastrophe naturelle, decret publie, degat reel mais mineur",
     "expected_coverage": "covered",
     "expected_risk_bucket": "low",
     "expected_decision": "escalate",
-    "rationale": "524 < 1900 <= 4000, low risk -> approuverait sans le flag; amount_vs_damage valide -> escalate",
+    "rationale": "524 < 3500 <= 4000, low risk -> approuverait sans le flag; amount_vs_damage valide (degat materiel reel mais mineur -- tapis trempes, vehicule fonctionnel -- et montant eleve non justifie) -> escalate",
     "expected_flags": [
       {
         "flag": "amount_vs_damage",
-        "evidence": "L'eau est juste montée un peu au niveau des pneus, rien de spectaculaire à voir, mais le garage me demande 1900 euros pour tout refaire."
+        "evidence": "Les tapis de sol sont trempés, c'est à peu près le seul dégât, la voiture démarre et roule normalement, mais le garage me demande pourtant 3500 euros pour tout refaire, sans même me dire ce qui serait abîmé."
       }
     ],
     "agent_clause_ids": [

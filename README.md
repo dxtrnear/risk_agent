@@ -40,3 +40,9 @@ as the project progresses (not a design log — see `DECISIONS.md` for that).
   positive on the same claim in all three runs, which only became visible as an
   escalation in the one run where the retrieval miss had already broken coverage.
   A retrieval gap and a flag false positive, not a single clean failure.
+- Some baseline-v1 runs cited clause 6.5 or 4.1.2 instead of 7 and still landed on
+  the right decision (reject) — but neither clause's actual text supports the
+  exclusion being invoked. Right outcome, wrong grounds. For an insurer, a refusal
+  that cites a clause which doesn't actually say what it's being used to say is a
+  badly grounded refusal, independent of whether the final decision happens to
+  be correct.
