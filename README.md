@@ -46,3 +46,15 @@ as the project progresses (not a design log — see `DECISIONS.md` for that).
   that cites a clause which doesn't actually say what it's being used to say is a
   badly grounded refusal, independent of whether the final decision happens to
   be correct.
+
+## Limits
+
+- `amount_vs_damage` needs a repair-cost reference, not just the model's own
+  sense of what a repair "should" cost. The original `golden_23`/`golden_41`
+  (kept in `evals/golden/borderline.json`, not scored) described real,
+  plausible-sounding damage mechanisms (a key-scratch repaint quote, "water at
+  tire height" flood damage) at amounts that aren't obviously wrong without
+  external pricing data — missed 6/6 across the v1 baseline. Rewriting them to
+  an unarguable disproportion (trivial/invisible damage, no justification
+  offered) fixed the golden labels but didn't give the flag an actual cost
+  reference; it will keep missing any real claim this ambiguous.

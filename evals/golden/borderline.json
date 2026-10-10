@@ -1,0 +1,27 @@
+{
+  "note": "Original golden_23/golden_41 claim texts, before the golden v2 rewrite. NOT part of golden.json, never loaded by run_eval.py, not scored. Kept as a record of a real finding: amount_vs_damage missed these 6 of 6 (3 runs x 2 cases, golden baseline v1) and caught the rewritten, unarguable versions 6 of 6 (golden baseline v2). The difference between the two versions of each case is exactly the kind of judgment call a repair-cost reference would resolve instead of relying on the model's own sense of what a repair 'should' cost -- see README Limits.",
+  "cases": [
+    {
+      "case_id": "golden_23_borderline",
+      "contract_id": 3152566,
+      "claim_text": "Bonjour, j'ai retrouvé ma voiture avec une petite rayure sur la portière avant, à peine visible, faite probablement par une clé sur le parking de mon travail. Franchement ce n'est presque rien, mais le garage me demande 1800 euros pour repeindre toute la portière et refaire la teinte. C'est pris en charge ?",
+      "claim_amount_eur": 1800,
+      "expected_flag": {
+        "flag": "amount_vs_damage",
+        "evidence": "Franchement ce n'est presque rien, mais le garage me demande 1800 euros pour repeindre toute la portière et refaire la teinte."
+      },
+      "result": "missed 3/3 runs in golden baseline v1 -- 1800 euros to repaint a door panel is a plausible real quote on its own, not obviously disproportionate without a reference cost"
+    },
+    {
+      "case_id": "golden_41_borderline",
+      "contract_id": 1055283,
+      "claim_text": "Bonjour, ma maison et ma rue ont été inondées par la crue de la semaine dernière, ma voiture garée devant chez moi a été endommagée par l'eau. Un arrêté interministériel a été publié au Journal Officiel reconnaissant l'état de catastrophe naturelle pour ma commune. L'eau est juste montée un peu au niveau des pneus, rien de spectaculaire à voir, mais le garage me demande 1900 euros pour tout refaire.",
+      "claim_amount_eur": 1900,
+      "expected_flag": {
+        "flag": "amount_vs_damage",
+        "evidence": "L'eau est juste montée un peu au niveau des pneus, rien de spectaculaire à voir, mais le garage me demande 1900 euros pour tout refaire."
+      },
+      "result": "missed 3/3 runs in golden baseline v1 -- 'water at tire height' describes a real flood-damage mechanism, so 1900 euros is not obviously disproportionate without a reference cost"
+    }
+  ]
+}
