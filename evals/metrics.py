@@ -1,4 +1,5 @@
-"""Code-level eval metrics (no judge model) computed from evals/run_eval.py's
+"""
+Code-level eval metrics (no judge model) computed from evals/run_eval.py's
 JSONL records. Every rate is returned with its raw counts (k of n), never a bare
 float -- limitation and flag positives are rare enough that a percentage alone
 would hide whether k is 1 or 100.
